@@ -5,15 +5,17 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 from threading import Event
 import time
 
-from .project import (AUDIO, FPS, IMAGE, VIDEO, FORMATS, EfirError, publish, staged_file)
+from .project import (AUDIO, FPS, IMAGE, VIDEO, FORMATS, EfirError, digest_file, publish, staged_file)
 
-RENDER_VERSION = 1
+RENDER_VERSION = 2
 SAMPLE_RATE = 48000
+CACHE_SEGMENT = re.compile(r"[a-f0-9]{64}\.mkv")
 
 
 def seconds(frames):
@@ -81,7 +83,7 @@ class Renderer:
         options = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
         try:
             with subprocess.Popen(
-                [self.ffmpeg, "-nostdin", "-hide_banner", "-loglevel", "error", *args],
+                [self.ffmpeg, "-nostdin", "-hide_banner", "-loglevel", "error", "-xerror", *args],
                 cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **options
             ) as process:
                 deadline = time.monotonic() + timeout
@@ -110,18 +112,19 @@ class Renderer:
         destination = project.output(destination, ".mp4")
         if destination.exists() and not overwrite:
             raise EfirError(f"Файл уже существует: {destination}")
-        if not project.scenes:
+        scenes = tuple(project.scenes)
+        if not scenes:
             raise EfirError("Добавьте хотя бы одну сцену.")
-        version = hashlib.sha256(self._run(["-version"], "Проверка FFmpeg", timeout=10)).hexdigest()
         width, height = FORMATS[project.aspect]
         if draft:
             width, height = width // 2, height // 2
+        version = hashlib.sha256(self._run(["-version"], "Проверка FFmpeg", timeout=10)).hexdigest()
         cache = project.inside(".cache")
         cache.mkdir(exist_ok=True)
         assets = {}
         segments = []
         encoded = 0
-        for index, scene in enumerate(project.scenes, 1):
+        for index, scene in enumerate(scenes, 1):
             self._check_cancel()
             for ref in (scene.visual, scene.voice):
                 if ref and ref not in assets:
@@ -129,26 +132,30 @@ class Renderer:
             key_data = (RENDER_VERSION, version, width, height, scene.visual, scene.voice,
                         scene.frames, scene.start_frame, scene.fit, scene.source_audio)
             key = hashlib.sha256(json.dumps(key_data).encode()).hexdigest()
-            segment = project.inside(".cache", key + ".mkv")
-            label = f"{index}/{len(project.scenes)} · {scene.title}"
-            if segment.is_file() and segment.stat().st_size:
+            directory = project.inside(".cache", key)
+            segment = self._cached_segment(project, directory)
+            label = f"{index}/{len(scenes)} · {scene.title}"
+            if segment is not None:
                 self.report(f"{label} · из кэша")
             else:
                 self.report(f"{label} · кодирование")
-                with staged_file(segment) as stage:
+                with staged_file(cache / "segment.mkv") as stage:
                     self._encode(scene, assets, stage, width, height, label)
+                    segment = project.inside(".cache", key, digest_file(stage) + ".mkv")
                     self._check_cancel()
-                    stage.replace(segment)
+                    directory.mkdir(exist_ok=True)
+                    self._publish_segment(stage, segment)
                 encoded += 1
             segments.append((segment, scene.frames))
 
         self.report("Сборка MP4")
         manifest = "ffconcat version 1.0\n" + "".join(
-            f"file {path.name}\nduration {seconds(frames)}\n" for path, frames in segments
+            f"file {path.relative_to(cache).as_posix()}\nduration {seconds(frames)}\n"
+            for path, frames in segments
         )
         with staged_file(cache / "scenes.ffconcat") as index, staged_file(cache / "captions.srt") as captions:
             index.write_text(manifest, encoding="ascii", newline="\n")
-            text = subtitles(project.scenes)
+            text = subtitles(scenes)
             args = ["-y", "-protocol_whitelist", "file", "-f", "concat", "-safe", "1",
                     "-i", index.name]
             if text:
@@ -164,6 +171,25 @@ class Renderer:
                 self._check_cancel()
                 publish(stage, destination, overwrite=overwrite)
         return RenderResult(destination.resolve(), encoded, len(segments) - encoded)
+
+    def _cached_segment(self, project, directory):
+        for candidate in directory.glob("*.mkv"):
+            self._check_cancel()
+            if not CACHE_SEGMENT.fullmatch(candidate.name):
+                continue
+            segment = project.inside(".cache", directory.name, candidate.name)
+            if segment.is_file() and digest_file(segment) == segment.stem:
+                return segment
+        return None
+
+    @staticmethod
+    def _publish_segment(stage, segment):
+        try:
+            # Another export may have published identical bytes during encoding.
+            publish(stage, segment, overwrite=False)
+        except EfirError:
+            if digest_file(segment) != segment.stem:
+                stage.replace(segment)
 
     def _encode(self, scene, assets, stage, width, height, label):
         visual = assets[scene.visual]
@@ -196,7 +222,8 @@ class Renderer:
             f"tpad=stop_mode=clone:stop_duration={seconds(scene.frames)},"
             f"trim=end_frame={scene.frames},setpts=N/({FPS}*TB)[video]"
         ]
-        audio = (f"aresample={SAMPLE_RATE},aformat=sample_fmts=fltp:channel_layouts=stereo,"
+        audio = (f"aresample={SAMPLE_RATE}:async=1:first_pts=0,"
+                 f"aformat=sample_fmts=fltp:channel_layouts=stereo,"
                  f"apad=whole_len={n_samples},atrim=end_sample={n_samples},asetpts=N/SR/TB")
         if scene.voice and scene.source_audio:
             filters += [f"[0:a:0]{audio},volume=0.25[clip]", f"[1:a:0]{audio},volume=0.75[voice]",
