@@ -122,6 +122,17 @@ class RenderTests(unittest.TestCase):
         self.assertLess(max(abs(sample) for sample in samples[:int(0.30 * 48000 * 2)]), 50)
         self.assertGreater(max(samples[int(0.36 * 48000 * 2):int(0.60 * 48000 * 2)]), 1000)
 
+    def test_contain_uses_display_aspect_ratio_for_anamorphic_video(self):
+        source = self.directory / "anamorphic.mp4"
+        self.ffmpeg("-f", "lavfi", "-i", "color=c=white:s=100x100:r=25:d=0.2",
+                    "-vf", "setsar=2", "-c:v", "libx264", str(source))
+        self.project.add(title="Anamorphic", visual=self.project.import_media(source), frames=5)
+        output = self.directory / "anamorphic-result.mp4"
+        Renderer(FFMPEG).export(self.project, output, draft=True)
+        gray = self.ffmpeg("-i", str(output), "-frames:v", "1", "-pix_fmt", "gray", "-f", "rawvideo", "-")
+        self.assertGreater(gray[480 * 540 + 270], 200)
+        self.assertLess(gray[300 * 540 + 270], 20)
+
     def test_parallel_mux_uses_its_own_manifest_and_captions(self):
         self.project.add(title="Первый", visual=self.clip, frames=9, caption="Альфа")
         second = self.project.add(title="Второй", visual=self.still, frames=6, caption="Бета")

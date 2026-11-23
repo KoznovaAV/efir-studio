@@ -210,12 +210,14 @@ class Renderer:
                 args += ["-enable_drefs", "0", "-use_absolute_path", "0"]
             args += ["-i", str(voice)]
 
+        # Use display aspect ratio before normalizing the output to square pixels.
         if scene.fit == "cover":
-            geometry = (f"scale={width}:{height}:force_original_aspect_ratio=increase:"
-                        f"force_divisible_by=2,crop={width}:{height}")
+            geometry = (f"scale='max({width},2*ceil({height}*dar/2))':"
+                        f"'max({height},2*ceil({width}/dar/2))',crop={width}:{height}")
         else:
-            geometry = (f"scale={width}:{height}:force_original_aspect_ratio=decrease:"
-                        f"force_divisible_by=2,pad={width}:{height}:(ow-iw)/2:(oh-ih)/2")
+            geometry = (f"scale='clip(2*trunc({height}*dar/2),2,{width})':"
+                        f"'clip(2*trunc({width}/dar/2),2,{height})',"
+                        f"pad={width}:{height}:(ow-iw)/2:(oh-ih)/2")
         n_samples = scene.frames * (SAMPLE_RATE // FPS)
         filters = [
             f"[0:V:0]fps={FPS},{geometry},setsar=1,format=yuv420p,"
