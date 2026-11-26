@@ -1,0 +1,16 @@
+{
+  "started_utc": "2026-11-26T18:58:24.386268+00:00",
+  "os": "Windows-11-10.0.26300-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "logical_cpus": 12,
+  "total_ram_mib": 16122,
+  "python": "3.13.16",
+  "psutil": "7.2.2",
+  "ffmpeg": "ffmpeg version 7.1-essentials_build-www.gyan.dev Copyright (c) 2000-2024 the FFmpeg developers",
+  "resolution": "540x960",
+  "fps": 25,
+  "sample_interval_sec": 0.05,
+  "requested_soak_sec": 60,
+  "selected_case": "all",
+  "actual_soak_wall_sec": 64.033
+}

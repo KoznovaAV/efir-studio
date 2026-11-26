@@ -6,7 +6,7 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 import hashlib
 import json
 import os
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 import shutil
 import tempfile
@@ -42,6 +42,17 @@ def frame_count(value, *, zero=False):
 def digest_file(path):
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def comparable_path(path):
+    if isinstance(path, PureWindowsPath):
+        name = str(path)
+        # Windows can retain this prefix when a path appears during realpath().
+        if name.upper().startswith("\\\\?\\UNC\\"):
+            return PureWindowsPath("\\\\" + name[8:])
+        if re.match(r"^\\\\\?\\[A-Za-z]:\\", name):
+            return PureWindowsPath(name[4:])
+    return path
 
 
 @contextmanager
@@ -134,7 +145,7 @@ class Project:
 
     def inside(self, *parts):
         path = self.root.joinpath(*parts)
-        if not path.resolve().is_relative_to(self.root):
+        if not comparable_path(path.resolve()).is_relative_to(comparable_path(self.root)):
             raise EfirError("Путь проекта ведёт за пределы его каталога.")
         return path
 
@@ -149,7 +160,7 @@ class Project:
     def open(cls, root):
         root = Path(root).resolve()
         manifest = root / "project.json"
-        if not manifest.resolve().is_relative_to(root):
+        if not comparable_path(manifest.resolve()).is_relative_to(comparable_path(root)):
             raise EfirError("Файл проекта ведёт за пределы его каталога.")
         try:
             raw = manifest.read_bytes()
@@ -241,8 +252,8 @@ class Project:
 
     def output(self, path, suffix):
         path = Path(path)
-        resolved = path.resolve()
-        managed = (self.inside("assets").resolve(), self.inside(".cache").resolve())
+        resolved = comparable_path(path.resolve())
+        managed = tuple(comparable_path(self.inside(folder).resolve()) for folder in ("assets", ".cache"))
         if (path.suffix.lower() != suffix or any(resolved.is_relative_to(folder) for folder in managed)
                 or not path.parent.is_dir()):
             raise EfirError(f"Выберите путь {suffix} в существующей папке вне assets и .cache.")

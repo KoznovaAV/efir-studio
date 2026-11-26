@@ -1,0 +1,10 @@
+[run]
+source = efir
+branch = True
+patch = subprocess
+parallel = True
+relative_files = True
+
+[report]
+precision = 2
+show_missing = True

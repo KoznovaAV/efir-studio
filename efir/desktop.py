@@ -9,7 +9,7 @@ from threading import Event, Thread
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
-from .project import AUDIO, FORMATS, IMAGE, VIDEO, EfirError, Project, frame_count
+from .project import AUDIO, IMAGE, VIDEO, EfirError, Project, frame_count
 from .render import RenderCancelled, Renderer, export_srt, seconds
 
 

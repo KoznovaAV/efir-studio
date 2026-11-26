@@ -1,0 +1,18 @@
+services:
+  efir:
+    build:
+      context: .
+    image: ${EFIR_IMAGE:-efir-studio:local}
+    user: "${EFIR_UID:-1000}:${EFIR_GID:-1000}"
+    network_mode: none
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:mode=1777,nosuid,nodev
+    volumes:
+      - type: bind
+        source: ${EFIR_WORKSPACE:-./workspace}
+        target: /workspace
+        bind:
+          create_host_path: false

@@ -1,0 +1,153 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH || $CI_COMMIT_TAG'
+
+stages: [quality, unit, integration, e2e, coverage, package, release]
+
+default:
+  tags: [cluster, kubernetes]
+
+variables:
+  PYTHONUTF8: '1'
+  PIP_DISABLE_PIP_VERSION_CHECK: '1'
+  EFIR_CI_PYTHON_IMAGE: python:3.13.16-slim-trixie@sha256:cf50a4f6ac4f026458b08d5222023d700ac806410dff5e9ca8728fa44f2b850f
+
+.university:
+  rules:
+    - if: &efir_local_main >-
+        $CI_SERVER_HOST == "vcs.uni-dubna.ru" &&
+        $CI_PROJECT_PATH == "KAV.24/efir-studio" &&
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH &&
+        $CI_COMMIT_REF_PROTECTED == "true" &&
+        ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web") &&
+        $EFIR_CI_RUNNER == "local"
+      when: never
+    - when: on_success
+
+.python:
+  extends: .university
+  image: $EFIR_CI_PYTHON_IMAGE
+
+.test:
+  extends: .python
+  artifacts: &junit_reports
+    when: always
+    expire_in: 14 days
+    reports:
+      junit: reports/qa/junit/*.xml
+
+lint:
+  extends: .python
+  stage: quality
+  script: [sh scripts/ci-python-stage.sh quality]
+
+unit:
+  extends: .test
+  stage: unit
+  script: [sh scripts/ci-python-stage.sh unit]
+
+integration:
+  extends: .test
+  stage: integration
+  script: [sh scripts/ci-python-stage.sh integration]
+
+e2e:
+  extends: .test
+  stage: e2e
+  script: [sh scripts/ci-python-stage.sh e2e]
+
+coverage:
+  extends: .python
+  stage: coverage
+  coverage: &line_coverage '/Line coverage: ([0-9.]+)%/'
+  script: [sh scripts/ci-python-stage.sh coverage]
+  artifacts: &coverage_reports
+    when: always
+    expire_in: 14 days
+    paths: [reports/qa/]
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: reports/qa/coverage.xml
+
+.docker:
+  image: docker:29.8.0-cli@sha256:eccaacfeed644c7de222ff047483568cb988dde95476fbaaf10ea2d04921bb66
+  services:
+    - name: docker:29.8.0-dind@sha256:5efed980cba3fc126cf54e21a5a6ff8849d05b6e0623d6e7612f48e9cd6cd17e
+      alias: docker
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ''
+    HEALTHCHECK_TCP_PORT: '2375'
+  before_script:
+    - docker info
+
+container:
+  extends: [.docker, .university]
+  stage: package
+  script:
+    - docker build --pull --tag efir-studio:ci .
+    - mkdir -p reports/docker
+    - docker image inspect efir-studio:ci > reports/docker/image.json
+    - docker run --rm -i --network none --entrypoint python efir-studio:ci - < tests/test_cli_e2e.py
+  artifacts: &image_reports
+    when: always
+    expire_in: 14 days
+    paths: [reports/docker/]
+
+.local:
+  tags: [efir-local]
+  dependencies: []
+  rules:
+    - if: *efir_local_main
+
+lint-local:
+  extends: .local
+  stage: quality
+  script: ['& .\scripts\ci-local.ps1 -Stage quality']
+
+unit-local:
+  extends: .local
+  stage: unit
+  script: ['& .\scripts\ci-local.ps1 -Stage unit']
+  artifacts: *junit_reports
+
+integration-local:
+  extends: .local
+  stage: integration
+  script: ['& .\scripts\ci-local.ps1 -Stage integration']
+  artifacts: *junit_reports
+
+e2e-local:
+  extends: .local
+  stage: e2e
+  script: ['& .\scripts\ci-local.ps1 -Stage e2e']
+  artifacts: *junit_reports
+
+coverage-local:
+  extends: .local
+  stage: coverage
+  coverage: *line_coverage
+  script: ['& .\scripts\ci-local.ps1 -Stage coverage']
+  artifacts: *coverage_reports
+
+container-local:
+  extends: .local
+  stage: package
+  script: ['& .\scripts\ci-local.ps1 -Stage package']
+  artifacts: *image_reports
+
+publish-image:
+  extends: .docker
+  stage: release
+  rules:
+    - if: '$CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/ && $CI_REGISTRY_IMAGE'
+  script:
+    - image="$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG"
+    - docker build --pull --tag "$image" .
+    - docker run --rm -i --network none --entrypoint python "$image" - < tests/test_cli_e2e.py
+    - printf '%s' "$CI_REGISTRY_PASSWORD" | docker login "$CI_REGISTRY" -u "$CI_REGISTRY_USER" --password-stdin
+    - docker push "$image"
