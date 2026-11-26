@@ -1,3 +1,4 @@
+import gc
 import os
 from pathlib import Path
 import subprocess
@@ -50,6 +51,7 @@ class EntryPointTests(unittest.TestCase):
 
         window = tkinter.Tk()
         window.withdraw()
+        self.addCleanup(gc.collect)
         self.addCleanup(window.destroy)
         studio = Studio(window)
         project = Project.create(self.project, "Рабочее окно")

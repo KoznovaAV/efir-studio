@@ -1,3 +1,8 @@
 __pycache__/
 *.py[cod]
 .efir-local/
+.coverage*
+!.coveragerc
+.ruff_cache/
+/reports/
+/workspace/

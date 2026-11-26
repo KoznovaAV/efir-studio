@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 from threading import Barrier, Event
 import unittest
@@ -40,6 +41,29 @@ class RenderTests(unittest.TestCase):
                               capture_output=True, timeout=30)
         self.assertEqual(call.returncode, 0, call.stderr.decode(errors="replace"))
         return call.stdout
+
+    def test_parallel_cold_cli_exports_share_project_without_path_errors(self):
+        for index in range(4):
+            self.project.add(title=f"Сцена {index}", visual=self.clip, frames=3 + index)
+        self.project.save()
+        self.assertFalse((self.project.root / ".cache").exists())
+        barrier = Barrier(2, timeout=10)
+
+        def export(number):
+            path = self.directory / f"Независимый экспорт {number}.mp4"
+            barrier.wait()
+            call = subprocess.run(
+                [sys.executable, "-X", "utf8", "-m", "efir", "export", str(self.project.root),
+                 str(path), "--draft", "--ffmpeg", FFMPEG],
+                encoding="utf-8", capture_output=True, timeout=35,
+            )
+            self.assertEqual(call.returncode, 0, call.stderr)
+            self.assertRegex(call.stdout, r"Кодирование: [0-4]; из кэша: [0-4]")
+            frames = self.ffmpeg("-i", str(path), "-map", "0:v:0", "-f", "framecrc", "-")
+            self.assertEqual(sum(line[:1].isdigit() for line in frames.splitlines()), 18)
+
+        with ThreadPoolExecutor(2) as pool:
+            list(pool.map(export, range(2)))
 
     def test_three_scene_mp4_and_selective_rerender(self):
         self.project.add(title="Движение", visual=self.clip, frames=13, source_audio=True,

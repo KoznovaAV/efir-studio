@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main, 'codex/efir-studio-v0.1', 'codex/efir-v01-*']
   workflow_dispatch:
 
 permissions:
@@ -21,13 +21,46 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
-      - name: Test FFmpeg binary
+      - name: Install QA tools and FFmpeg binary
         shell: bash
         run: |
-          python -m pip install --only-binary=:all: imageio-ffmpeg==0.6.0
+          python -m pip install --only-binary=:all: -r requirements-qa.txt imageio-ffmpeg==0.6.0
           echo "EFIR_FFMPEG=$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')" >> "$GITHUB_ENV"
-      - name: Run CPU tests
+      - name: Install virtual display on Linux
+        if: runner.os == 'Linux'
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends xvfb xauth tk
+      - name: Lint
+        run: python -m ruff check efir tests scripts
+      - name: Test and measure coverage
+        shell: bash
         env:
           PYTHONUTF8: '1'
-          EFIR_TEST_DESKTOP: ${{ runner.os == 'Windows' && '1' || '0' }}
-        run: python -m unittest discover -s tests -v
+          EFIR_TEST_DESKTOP: '1'
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a python -m coverage run -m xmlrunner discover -s tests -v -o reports/qa/junit
+          else
+            python -m coverage run -m xmlrunner discover -s tests -v -o reports/qa/junit
+          fi
+      - name: Write reports and enforce line coverage
+        if: always()
+        run: python scripts/coverage_report.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-${{ matrix.os }}
+          path: reports/qa/
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and test the CLI image
+        shell: bash
+        run: |
+          mkdir -p workspace
+          chmod a+rwx workspace
+          docker compose config --quiet
+          docker compose build
+          docker compose run --rm -T -e EFIR_E2E_TEMP=/workspace --entrypoint python efir - +            < tests/test_cli_e2e.py
+          docker compose run --rm -T efir init /workspace/persistence --title Persistent
+          docker compose run --rm -T efir list /workspace/persistence
