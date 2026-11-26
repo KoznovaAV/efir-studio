@@ -2,10 +2,12 @@
 set -eu
 
 install_wheels() {
+    if [ "${EFIR_CI_TOOLS_READY:-}" = 1 ]; then return; fi
     python -m pip --disable-pip-version-check install --only-binary=:all: "$@"
 }
 
 setup_media() {
+    if [ "${EFIR_CI_TOOLS_READY:-}" = 1 ]; then return; fi
     apt-get update -qq
     apt-get install -y --no-install-recommends xvfb xauth tk
     install_wheels unittest-xml-reporting==3.2.0 coverage==7.13.5 imageio-ffmpeg==0.6.0

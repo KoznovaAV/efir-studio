@@ -47,6 +47,10 @@ try {
     if ([string]::IsNullOrWhiteSpace($pythonImage)) {
         throw 'EFIR_CI_PYTHON_IMAGE must be set to the pinned image from .gitlab-ci.yml.'
     }
+    $toolsImage = 'efir-studio:ci-tools'
+    & docker build --tag $toolsImage --file (Join-Path $PSScriptRoot 'Dockerfile.ci-tools') `
+        --build-arg "EFIR_CI_PYTHON_IMAGE=$pythonImage" $PSScriptRoot
+    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
     # Export tracked sources only. The worker container does not see .git, local
     # files, CI credentials or the Docker socket.
@@ -65,10 +69,10 @@ sh scripts/ci-python-stage.sh "$1" || status=$?
 if [ -d reports ]; then cp -R reports/. /ci-artifacts/; fi
 exit "$status"
 '@
-        & docker run --rm @dockerLimits --env PYTHONUTF8=1 `
+        & docker run --rm @dockerLimits --network none --cap-drop ALL `
             --mount "type=bind,source=$archive,target=/source.tar,readonly" `
             --mount "type=bind,source=$reportPath,target=/ci-artifacts" `
-            $pythonImage sh -ec $bootstrap efir-ci $Stage
+            $toolsImage sh -ec $bootstrap efir-ci $Stage
         exit $LASTEXITCODE
     }
     finally {

@@ -23,7 +23,7 @@ variables:
         $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH &&
         $CI_COMMIT_REF_PROTECTED == "true" &&
         ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web") &&
-        $EFIR_CI_RUNNER != "university"
+        $EFIR_CI_RUNNER == "local"
       when: never
     - when: on_success
 

@@ -1,0 +1,12 @@
+ARG EFIR_CI_PYTHON_IMAGE
+FROM mwader/static-ffmpeg:8.1.1@sha256:735f84b905e00d5c618b667f0b053f83b1096f5fc404c607e6134bf2275a0e0a AS codecs
+FROM ${EFIR_CI_PYTHON_IMAGE}
+
+RUN apt-get update -qq \
+    && apt-get install -y --no-install-recommends xvfb xauth tk \
+    && rm -rf /var/lib/apt/lists/* \
+    && python -m pip --disable-pip-version-check install --no-cache-dir --only-binary=:all: \
+        ruff==0.15.7 coverage==7.13.5 unittest-xml-reporting==3.2.0
+COPY --from=codecs /ffmpeg /usr/local/bin/ffmpeg
+ENV EFIR_CI_TOOLS_READY=1 EFIR_FFMPEG=/usr/local/bin/ffmpeg EFIR_TEST_DESKTOP=1 PYTHONUTF8=1
+USER 1000:1000
