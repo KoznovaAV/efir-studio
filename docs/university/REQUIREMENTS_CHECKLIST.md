@@ -11,7 +11,7 @@
 | Сборка Docker, рабочий Compose и сохранение файлов | Подтверждено локально. [Отчёт](DOCKER_REPORT.md) |
 | GitHub Actions для ветки аудита и QA, артефакты | [Сводка тестирования](TESTING_REPORT.md) |
 | Учебный репозиторий и CI/CD | Код PR №3 опубликован в `main`. [Репозиторий](https://vcs.uni-dubna.ru/KAV.24/efir-studio) · [Проверка и инструкция](GITLAB_CICD_REPORT.md) |
-| Фактический GitLab pipeline и его артефакты | №811 наблюдался в `pending / stuck`. Конфигурация теперь передаёт теги `cluster` и `kubernetes` всем заданиям. Нужны фактический запуск и проверка артефактов. [Pipeline №811](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines/811) · [Все запуски](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines) |
+| Фактический GitLab pipeline и его артефакты | №812 ожидает доступного runner даже с тегами `cluster`, `kubernetes`. Все шесть стадий `efir-local` прошли локальную репетицию. Полный набор 41/41, покрытие строк 98,92%, образ и E2E проверены. Нужны разрешение на регистрацию, серверный прогон и проверка артефактов. [Pipeline №812](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines/812) · [Результаты репетиции](GITLAB_CICD_REPORT.md#локальная-репетиция-профиля) |
 | Container Registry | Опциональный пункт. Доступность и запуск публикации проверяются отдельно |
 | Документы и дорожная карта | [Комплект](README.md), [план](../roadmap/PRODUCT_ROADMAP.md) |
 

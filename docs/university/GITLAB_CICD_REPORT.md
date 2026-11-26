@@ -62,6 +62,25 @@ git log -1 --oneline
 - `package` отдельно проверяет связь с Docker daemon командой `docker info`, собирает образ и запускает в нём CLI E2E без сети. Для существующего сервиса Docker-in-Docker Kubernetes runner должен разрешать привилегированный контейнер сервиса. Строка о Kubernetes executor в `lint` этого разрешения не подтверждает. [Docker-in-Docker на Kubernetes](https://docs.gitlab.com/ci/docker/using_docker_build/#docker-in-docker-with-tls-enabled-in-kubernetes)
 - Если университет запрещает Docker-in-Docker, совместимые варианты нужно согласовать с администратором. Rootless BuildKit может собрать OCI-образ без Docker daemon при поддержке user namespaces и политик кластера. Для приёмки потребуется также разрешённый запуск именно этого образа с E2E, например на отдельном выделенном runner с разрешённым runtime. Если кластер уже предоставляет утверждённый runner для сборки и запуска контейнеров, `package` можно назначить на его тег. [Rootless BuildKit](https://docs.gitlab.com/ci/docker/using_buildkit/)
 
-Если университетский runner не может принять задания или собрать и запустить образ, действуйте по [плану Windows Runner](WINDOWS_RUNNER_FALLBACK.md).
+## Резервный профиль EFIR Studio
+
+[Pipeline №812](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines/812), [`lint` №5573](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/jobs/5573) подтвердил, что GitLab не нашёл активного или доступного runner под теги `cluster`, `kubernetes`. Исполнение в Kubernetes и возможности Docker-in-Docker в университете остаются неподтверждёнными.
+
+Резервный профиль `EFIR_CI_RUNNER=local` реализован для защищённого `main` именно этого проекта. Он использует Project runner с тегом `efir-local` и ту же группу Python-проверок, JUnit и порог покрытия, что университетский профиль. В `package` Docker Desktop собирает образ и выполняет E2E внутри него. Регистрация требует разрешения университета и ввода проектного registration token в локальном PowerShell. [Команды и обращение администратору](WINDOWS_RUNNER_FALLBACK.md)
+
+### Локальная репетиция профиля
+
+26 ноября 2026 года скрипты запуска проверены через штатный Windows PowerShell и Docker Desktop 29.8.0. Каждый этап запущен последовательно. Код проверки использовал обычные Linux-контейнеры на WSL2.
+
+| Этап | Локальный результат |
+|---|---|
+| Quality | Ruff и `compileall` прошли |
+| Unit | 17 тестов прошли |
+| Integration | 23 теста прошли, включая Tk под Xvfb |
+| E2E | CLI-тест прошёл |
+| Coverage | Полный набор **41/41**. Строки **98,92% (825/834)**, ветви **96,58% (226/234)**. Порог 95% пройден |
+| Package | Образ собран, CLI E2E внутри него прошёл с отключённой сетью |
+
+JUnit, HTML, Cobertura, JSON и сведения об образе созданы локально этой же конфигурацией. Загрузка артефактов и результаты выполнения заданий в университетском GitLab требуют зарегистрированного runner. Анонимный серверный CI Lint недоступен. Запуск №812 подтверждает только стадию назначения runner.
 
 Проверки кода и контейнера на GitHub прошли отдельно. [GitHub Actions](https://github.com/KoznovaAV/efir-studio/actions/runs/45885051835) · [Методика и локальные результаты](TESTING_REPORT.md)
