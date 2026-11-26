@@ -11,7 +11,7 @@
 | Сборка Docker, рабочий Compose и сохранение файлов | Подтверждено локально. [Отчёт](DOCKER_REPORT.md) |
 | GitHub Actions для ветки аудита и QA, артефакты | [Сводка тестирования](TESTING_REPORT.md) |
 | Учебный репозиторий и CI/CD | Код PR №3 опубликован в `main`. [Репозиторий](https://vcs.uni-dubna.ru/KAV.24/efir-studio) · [Проверка и инструкция](GITLAB_CICD_REPORT.md) |
-| Фактический GitLab pipeline и его артефакты | Подтверждение ожидает доступа к API. [Запуски](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines) |
+| Фактический GitLab pipeline и его артефакты | Запуск №809 создан, отмечен `pending / stuck`. Все шесть job ещё ожидают выполнения. [Pipeline №809](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines/809) |
 | Container Registry | Опциональный пункт. Доступность и запуск публикации проверяются отдельно |
 | Документы и дорожная карта | [Комплект](README.md), [план](../roadmap/PRODUCT_ROADMAP.md) |
 
