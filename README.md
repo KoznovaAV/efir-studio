@@ -50,4 +50,6 @@ python -m unittest discover -s tests -v
 
 Порог покрытия, CLI E2E, ручные сценарии и нагрузочные измерения собраны в [учебном комплекте](docs/university/README.md). Headless-версию CLI можно запускать в [Docker Compose](docs/university/DOCKER_REPORT.md), включая экспорт в каталог на компьютере. Настольный интерфейс запускается нативно.
 
+Материалы для преподавателя: [учебный GitLab](https://vcs.uni-dubna.ru/KAV.24/efir-studio), [GitLab CI/CD](docs/university/GITLAB_CICD_REPORT.md) и [команды для защиты](docs/university/DEFENSE_GUIDE.md).
+
 Код EFIR опубликован под [MIT](LICENSE). FFmpeg устанавливается или запускается отдельно по условиям его сборки.

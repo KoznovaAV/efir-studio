@@ -1,6 +1,6 @@
 # GitLab CI/CD и публикация
 
-GitHub остаётся главным публичным репозиторием. `.gitlab-ci.yml` описывает сборку копии проекта в GitLab. Workflow GitHub отдельно запускает тесты для `main` и базовых веток цепочки v0.1.
+GitHub остаётся главным публичным репозиторием. Учебная версия опубликована в основном рефе `main` [университетского GitLab](https://vcs.uni-dubna.ru/KAV.24/efir-studio). Workflow GitHub проверяет публичную [ветку PR №3](https://github.com/KoznovaAV/efir-studio/pull/3).
 
 | Стадия | Задание и результат |
 |---|---|
@@ -14,18 +14,25 @@ GitHub остаётся главным публичным репозиторие
 
 GitLab показывает JUnit в интерфейсе тестов и Cobertura в изменениях Merge Request. HTML, XML и JSON хранятся 14 дней. Для pipeline с MR правило пропускает дублирующий push pipeline. Для сборки образа нужен Linux Docker runner с поддержкой Docker-in-Docker, а для публикации также включённый Container Registry. Dind работает в сетевом сегменте CI job. GitLab выдаёт `CI_REGISTRY`, `CI_REGISTRY_IMAGE`, `CI_REGISTRY_USER` и `CI_REGISTRY_PASSWORD`. Пароль передаётся на stdin встроенной команды. [Docker-in-Docker](https://docs.gitlab.com/ci/docker/using_docker_build/) · [Отчёты покрытия](https://docs.gitlab.com/ci/testing/code_coverage/)
 
-## Подключение университетского репозитория
+## Репозиторий и история
 
-1. В существующей учётной записи GitLab создайте или выберите пустой учебный проект. Для курса подойдёт отдельный private проект либо проект учебной группы. Скопируйте URL Git.
-2. Добавьте второй remote. Замените `GROUP` и при необходимости адрес сервера. Из ветки QA отправьте её и базовую ветку. Отправка `main` переносит историю с GitHub и не меняет GitHub. Если учебный проект уже имеет собственные коммиты, сначала сравните историю и согласуйте обычный merge.
+Локальная QA-ветка использует `origin` для GitHub и `gitlab` как второй remote. В учебном `main` был один начальный коммит `770063e` со стандартным README GitLab. Коммит интеграции `7950dc5` имеет двумя родителями этот коммит и проверенную QA-версию `194fa0a`. Тем самым история учебного репозитория сохранена, дерево публикации соответствует PR №3 и включает изменения PR №1 и №2.
+
+Команды преподавателя для проверки учебной версии:
 
 ```powershell
-git remote add gitlab https://gitlab.com/GROUP/efir-studio.git
-git push gitlab main
-git push gitlab codex/efir-studio-v0.1 codex/efir-v01-audit codex/efir-v01-qa-ci
+git clone https://vcs.uni-dubna.ru/KAV.24/efir-studio.git
+Set-Location efir-studio
+git log -1 --oneline
 ```
 
-3. До переноса стабильной версии запустите pipeline на `codex/efir-v01-qa-ci`. Проверьте **Build → Pipelines** и JUnit, HTML, XML. После согласованного GitHub merge переносите актуальный `main` обычным push. Для автоматического pull mirror учитывайте тариф GitLab. Последовательный push отдельных веток подходит и без pull mirroring. [Pull mirroring](https://docs.gitlab.com/user/project/repository/mirror/pull/)
-4. Для release job включите Container Registry и защитите шаблон тегов `v*` в настройках проекта. Релизный тег ставится на согласованный коммит. На GitLab Self-Managed согласуйте с администратором доступный runner с Dind.
+Синхронизация последующих изменений ведётся из QA-ветки. Перед отправкой нужно получить текущий `gitlab/main`, сохранить его родителем коммита интеграции, сравнить дерево с SHA QA-ветки и выполнить обычный fast-forward push. Для проверки можно сравнить `git diff gitlab/main origin/codex/efir-v01-qa-ci`.
 
-**Фактический статус.** YAML разобран локально. Команды тестов и сборки имеют отдельные локальные и GitHub проверки с указанием среды в [отчёте](TESTING_REPORT.md). В рабочем репозитории настроен только GitHub remote, адрес и авторизация университетского GitLab отсутствуют. GitLab pipeline, серверный CI Lint и публикация образа ожидают привязки проекта.
+## Проверка преподавателем
+
+1. Войти в университетский GitLab и открыть [проект](https://vcs.uni-dubna.ru/KAV.24/efir-studio). Нужен доступ к проекту от учебной группы.
+2. Перейти в [Build → Pipelines](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines), открыть запуск для `main` и сверить его SHA с проверяемым коммитом.
+3. Для результатов JUnit открыть вкладку **Tests** конкретного pipeline. Для показателей покрытия открыть job `coverage` и найти строки `Line coverage` и `Branch coverage`. В артефактах job выбрать `reports/qa/html/index.html` и `reports/qa/coverage.xml`. Cobertura отображает покрытие изменений в Merge Request при наличии сравниваемого диффа.
+4. Открыть лог `e2e` для результата CLI-теста. В `container` проверить запись сборки и результат того же теста внутри образа. Для самостоятельного выполнения используйте [команды защиты](DEFENSE_GUIDE.md).
+
+**Статус проверки.** Публикация кода в учебный `main` подтверждена через Git. Прежний доступ Git вернул HTTP 403 для версионного и проектных API. Серверный CI Lint, статус runner, результат pipeline и доступность Registry требуют проверки с доступом API. Результаты локальных проверок и GitHub описаны в [отчёте о тестировании](TESTING_REPORT.md).
