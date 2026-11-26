@@ -13,68 +13,58 @@ default:
 variables:
   PYTHONUTF8: '1'
   PIP_DISABLE_PIP_VERSION_CHECK: '1'
+  EFIR_CI_PYTHON_IMAGE: python:3.13.16-slim-trixie@sha256:cf50a4f6ac4f026458b08d5222023d700ac806410dff5e9ca8728fa44f2b850f
+
+.university:
+  rules:
+    - if: &efir_local_main >-
+        $CI_SERVER_HOST == "vcs.uni-dubna.ru" &&
+        $CI_PROJECT_PATH == "KAV.24/efir-studio" &&
+        $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH &&
+        $CI_COMMIT_REF_PROTECTED == "true" &&
+        ($CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "web") &&
+        $EFIR_CI_RUNNER != "university"
+      when: never
+    - when: on_success
 
 .python:
-  image: python:3.13.16-slim-trixie@sha256:cf50a4f6ac4f026458b08d5222023d700ac806410dff5e9ca8728fa44f2b850f
+  extends: .university
+  image: $EFIR_CI_PYTHON_IMAGE
 
 .test:
   extends: .python
-  before_script:
-    - 'pip install --only-binary=:all: unittest-xml-reporting==3.2.0'
-  artifacts:
+  artifacts: &junit_reports
     when: always
     expire_in: 14 days
     reports:
       junit: reports/qa/junit/*.xml
 
-.media:
-  extends: .test
-  before_script:
-    - apt-get update -qq
-    - apt-get install -y --no-install-recommends xvfb xauth tk
-    - 'pip install --only-binary=:all: unittest-xml-reporting==3.2.0 coverage==7.13.5 imageio-ffmpeg==0.6.0'
-    - export EFIR_FFMPEG="$(python -c 'import imageio_ffmpeg; print(imageio_ffmpeg.get_ffmpeg_exe())')" EFIR_TEST_DESKTOP=1
-
 lint:
   extends: .python
   stage: quality
-  script:
-    - 'pip install --only-binary=:all: ruff==0.15.7'
-    - python -m ruff check efir tests scripts
-    - python -m compileall -q efir tests scripts
+  script: [sh scripts/ci-python-stage.sh quality]
 
 unit:
   extends: .test
   stage: unit
-  script:
-    - python -m xmlrunner discover -s tests -p test_project.py -v -o reports/qa/junit
-    - python -m xmlrunner discover -s tests -p test_core_edges.py -v -o reports/qa/junit
+  script: [sh scripts/ci-python-stage.sh unit]
 
 integration:
-  extends: .media
+  extends: .test
   stage: integration
-  script:
-    - python -m xmlrunner discover -s tests -p test_render.py -v -o reports/qa/junit
-    - xvfb-run -a python -m xmlrunner discover -s tests -p test_entry_points.py -v -o reports/qa/junit
-    - xvfb-run -a python -m xmlrunner discover -s tests -p test_desktop.py -v -o reports/qa/junit
+  script: [sh scripts/ci-python-stage.sh integration]
 
 e2e:
-  extends: .media
+  extends: .test
   stage: e2e
-  script:
-    - python -m xmlrunner discover -s tests -p test_cli_e2e.py -v -o reports/qa/junit
+  script: [sh scripts/ci-python-stage.sh e2e]
 
 coverage:
-  extends: .media
+  extends: .python
   stage: coverage
-  coverage: '/Line coverage: ([0-9.]+)%/'
-  script:
-    - |
-      tests_status=0
-      xvfb-run -a python -m coverage run -m unittest discover -s tests -v || tests_status=$?
-      python scripts/coverage_report.py || exit $?
-      exit "$tests_status"
-  artifacts:
+  coverage: &line_coverage '/Line coverage: ([0-9.]+)%/'
+  script: [sh scripts/ci-python-stage.sh coverage]
+  artifacts: &coverage_reports
     when: always
     expire_in: 14 days
     paths: [reports/qa/]
@@ -96,17 +86,59 @@ coverage:
     - docker info
 
 container:
-  extends: .docker
+  extends: [.docker, .university]
   stage: package
   script:
     - docker build --pull --tag efir-studio:ci .
     - mkdir -p reports/docker
     - docker image inspect efir-studio:ci > reports/docker/image.json
     - docker run --rm -i --network none --entrypoint python efir-studio:ci - < tests/test_cli_e2e.py
-  artifacts:
+  artifacts: &image_reports
     when: always
     expire_in: 14 days
     paths: [reports/docker/]
+
+.local:
+  tags: [efir-local]
+  dependencies: []
+  rules:
+    - if: *efir_local_main
+
+lint-local:
+  extends: .local
+  stage: quality
+  script: ['& .\scripts\ci-local.ps1 -Stage quality']
+
+unit-local:
+  extends: .local
+  stage: unit
+  script: ['& .\scripts\ci-local.ps1 -Stage unit']
+  artifacts: *junit_reports
+
+integration-local:
+  extends: .local
+  stage: integration
+  script: ['& .\scripts\ci-local.ps1 -Stage integration']
+  artifacts: *junit_reports
+
+e2e-local:
+  extends: .local
+  stage: e2e
+  script: ['& .\scripts\ci-local.ps1 -Stage e2e']
+  artifacts: *junit_reports
+
+coverage-local:
+  extends: .local
+  stage: coverage
+  coverage: *line_coverage
+  script: ['& .\scripts\ci-local.ps1 -Stage coverage']
+  artifacts: *coverage_reports
+
+container-local:
+  extends: .local
+  stage: package
+  script: ['& .\scripts\ci-local.ps1 -Stage package']
+  artifacts: *image_reports
 
 publish-image:
   extends: .docker
