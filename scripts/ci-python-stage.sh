@@ -26,12 +26,14 @@ case "${1:-}" in
         install_wheels unittest-xml-reporting==3.2.0
         python -m xmlrunner discover -s tests -p test_project.py -v -o reports/qa/junit
         python -m xmlrunner discover -s tests -p test_core_edges.py -v -o reports/qa/junit
+        python -m xmlrunner discover -s tests -p test_studio.py -v -o reports/qa/junit
         ;;
     integration)
         setup_media
         python -m xmlrunner discover -s tests -p test_render.py -v -o reports/qa/junit
         xvfb-run -a python -m xmlrunner discover -s tests -p test_entry_points.py -v -o reports/qa/junit
         xvfb-run -a python -m xmlrunner discover -s tests -p test_desktop.py -v -o reports/qa/junit
+        xvfb-run -a python -m xmlrunner discover -s tests -p test_workspace.py -v -o reports/qa/junit
         ;;
     e2e)
         setup_media

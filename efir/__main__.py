@@ -7,6 +7,7 @@ import sys
 from . import __version__
 from .project import EfirError, FORMATS, Project, frame_count
 from .render import Renderer, export_srt, seconds
+from .store import StudioProject, migrate, open_project
 
 
 def scene_options(parser, *, new):
@@ -23,6 +24,7 @@ def scene_options(parser, *, new):
         voices.add_argument("--clear-voice", action="store_true", help="убрать отдельную дорожку")
     parser.add_argument("--caption", help="субтитр на всю сцену")
     parser.add_argument("--notes", help="заметки, источник, модель или промпт")
+    parser.add_argument("--speech", help="реплика в проекте SQLite")
 
 
 def parser():
@@ -32,6 +34,7 @@ def parser():
     init = commands.add_parser("init", help="создать проект")
     init.add_argument("--title", required=True)
     init.add_argument("--aspect", choices=FORMATS, default="9:16")
+    init.add_argument("--sqlite", action="store_true", help="формат проекта v0.2")
     add = commands.add_parser("add", help="добавить сцену")
     scene_options(add, new=True)
     edit = commands.add_parser("edit", help="изменить сцену")
@@ -57,6 +60,7 @@ def parser():
         command.add_argument("--overwrite", action="store_true")
     desktop = commands.add_parser("desktop", help="открыть настольное приложение")
     desktop.add_argument("project", nargs="?", type=Path)
+    studio_commands(commands)
     return root
 
 
@@ -66,6 +70,9 @@ def scene_fields(args, project):
         value = getattr(args, field)
         if value is not None:
             fields[field] = value
+    if args.speech is not None:
+        require_studio(project)
+        fields["speech"] = args.speech
     if args.duration is not None:
         fields["frames"] = frame_count(args.duration)
     if args.start is not None:
@@ -85,9 +92,13 @@ def run(args):
         launch(args.project)
         return
     if args.command == "init":
-        print(Project.create(args.project, args.title, args.aspect).root)
+        format_class = StudioProject if args.sqlite else Project
+        print(format_class.create(args.project, args.title, args.aspect).root)
         return
-    project = Project.open(args.project)
+    if args.command == "migrate":
+        print(migrate(args.project, args.destination).root)
+        return
+    project = open_project(args.project)
     match args.command:
         case "add" | "edit":
             if args.command == "edit":
@@ -114,6 +125,100 @@ def run(args):
         case "srt":
             export_srt(project, args.output, overwrite=args.overwrite)
             print(args.output.resolve())
+        case _:
+            run_studio(args, require_studio(project))
+
+
+def require_studio(project):
+    if not isinstance(project, StudioProject):
+        raise EfirError("Эта команда требует SQLite. Перенесите проект командой migrate.")
+    return project
+
+
+def studio_commands(commands):
+    for name, help_text in {
+        "migrate": "скопировать проект v0.1 в SQLite", "portable": "сохранить переносимый проект",
+        "history": "показать ревизии", "restore": "восстановить ревизию",
+        "background": "прикрепить фон или убрать его", "plan": "предложить план через Ollama",
+        "apply": "подтвердить план", "reject": "отклонить план",
+        "voice": "поставить озвучку в очередь", "queue-export": "поставить MP4 в очередь",
+        "jobs": "показать очередь", "work": "выполнить одну задачу", "cancel": "отменить задачу",
+        "retry": "повторить задачу",
+    }.items():
+        command = commands.add_parser(name, help=help_text)
+        command.add_argument("project", type=Path)
+        match name:
+            case "migrate" | "portable":
+                command.add_argument("destination", type=Path)
+            case "restore":
+                command.add_argument("revision", type=int)
+            case "background":
+                command.add_argument("audio", type=Path, nargs="?")
+            case "plan":
+                command.add_argument("text")
+                command.add_argument("--model")
+            case "apply" | "reject":
+                command.add_argument("proposal")
+            case "voice":
+                command.add_argument("scene")
+                command.add_argument("--regenerate", action="store_true")
+            case "queue-export":
+                command.add_argument("--draft", action="store_true")
+            case "work":
+                command.add_argument("--piper", action="store_true", help="использовать настроенный Piper")
+            case "cancel" | "retry":
+                command.add_argument("job")
+
+
+def run_studio(args, project):
+    import json
+    import os
+
+    from .assistant import Ollama, decision, preview_text, proposals, propose
+    from .jobs import Queue, run_one
+    from .tts import Piper
+
+    queue = Queue(project)
+    match args.command:
+        case "portable":
+            print(project.portable(args.destination))
+        case "history":
+            for revision in project.history():
+                print(revision["id"], revision["created"], revision["reason"])
+        case "restore":
+            print(project.restore(args.revision).revision)
+        case "background":
+            project.background = project.import_media(args.audio, voice=True) if args.audio else None
+            project.save("Фоновая дорожка")
+        case "plan":
+            model = args.model or os.environ.get("EFIR_OLLAMA_MODEL", "qwen3:4b")
+            plan_id = propose(project, Ollama(model), args.text)
+            operations = next(p for p in proposals(project) if p["id"] == plan_id)["operations"]
+            print(plan_id)
+            for operation in json.loads(operations):
+                print(preview_text(project, operation))
+        case "apply":
+            pending = next((p for p in proposals(project) if p["id"] == args.proposal), None)
+            tts = Piper.configured() if pending and any(
+                op["op"] == "voice" for op in json.loads(pending["operations"])) else None
+            revision, jobs = decision(project, args.proposal, accept=True, recipe=tts.recipe if tts else None)
+            print(revision, *jobs)
+        case "reject":
+            decision(project, args.proposal, accept=False)
+        case "voice":
+            print(queue.enqueue("voice", scene_id=args.scene, recipe=Piper.configured().recipe,
+                                regenerate=args.regenerate))
+        case "queue-export":
+            print(queue.enqueue("export", draft=args.draft))
+        case "jobs":
+            for job in queue.jobs():
+                print(json.dumps(job, ensure_ascii=False))
+        case "work":
+            print(run_one(project, tts=Piper.configured() if args.piper else None) or "Нет доступных задач.")
+        case "cancel":
+            queue.cancel(args.job)
+        case "retry":
+            queue.retry(args.job)
 
 
 def main(argv=None):

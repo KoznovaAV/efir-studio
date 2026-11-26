@@ -126,6 +126,8 @@ class Renderer:
         encoded = 0
         for index, scene in enumerate(scenes, 1):
             self._check_cancel()
+            if scene.visual is None:
+                raise EfirError(f"Добавьте видео или изображение для сцены «{scene.title}».")
             for ref in (scene.visual, scene.voice):
                 if ref and ref not in assets:
                     assets[ref] = project.asset(ref)
@@ -161,7 +163,13 @@ class Renderer:
             if text:
                 captions.write_text(text, encoding="utf-8", newline="\n")
                 args += ["-protocol_whitelist", "file", "-f", "srt", "-i", captions.name]
-            args += ["-map", "0:v:0", "-map", "0:a:0"]
+            background = getattr(project, "background", None)
+            if background:
+                args += ["-protocol_whitelist", "file", "-i", str(project.asset(background)),
+                         "-filter_complex",
+                         f"[{2 if text else 1}:a]volume=0.18[bed];"
+                         "[0:a][bed]amix=inputs=2:duration=first:normalize=0,alimiter=latency=1[mix]"]
+            args += ["-map", "0:v:0", "-map", "[mix]" if background else "0:a:0"]
             if text:
                 args += ["-map", "1:0", "-c:s", "mov_text", "-metadata:s:s:0", "title=Captions"]
             args += ["-c:v", "copy",

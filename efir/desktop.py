@@ -11,6 +11,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from .project import AUDIO, IMAGE, VIDEO, EfirError, Project, frame_count
 from .render import RenderCancelled, Renderer, export_srt, seconds
+from .store import StudioProject, open_project
 
 
 class SceneDialog(simpledialog.Dialog):
@@ -30,7 +31,7 @@ class SceneDialog(simpledialog.Dialog):
         self.start = tk.StringVar(value=seconds(scene.start_frame) if scene else "0")
         self.fit = tk.StringVar(value=scene.fit if scene else "contain")
         self.source_audio = tk.BooleanVar(value=scene.source_audio if scene else False)
-        self.visual_label = tk.StringVar(value="Исходник проекта" if scene else "Выберите файл")
+        self.visual_label = tk.StringVar(value="Исходник проекта" if scene and scene.visual else "Выберите файл")
         self.voice_label = tk.StringVar(value="Дорожка проекта" if scene and scene.voice else "Без отдельной дорожки")
         first = ttk.Entry(form, textvariable=self.title_field, width=47)
         self._row(form, 0, "Название", first)
@@ -60,6 +61,10 @@ class SceneDialog(simpledialog.Dialog):
         ):
             widget.insert("1.0", text)
             self._row(form, row, label, widget)
+        if isinstance(self.project, StudioProject):
+            self.speech = tk.Text(form, height=4, width=40, wrap="word")
+            self.speech.insert("1.0", scene.speech if scene else "")
+            self._row(form, 9, "Реплика", self.speech)
         return first
 
     @staticmethod
@@ -89,7 +94,8 @@ class SceneDialog(simpledialog.Dialog):
         self.voice_label.set("Без отдельной дорожки")
 
     def validate(self):
-        if not self.title_field.get().strip() or not (self.visual or self.scene):
+        studio = isinstance(self.project, StudioProject)
+        if not self.title_field.get().strip() or not (self.visual or self.scene or studio):
             messagebox.showerror("Сцена", "Укажите название и выберите клип или изображение.", parent=self)
             return False
         try:
@@ -102,11 +108,15 @@ class SceneDialog(simpledialog.Dialog):
                 "caption": self.caption.get("1.0", "end-1c"),
                 "notes": self.notes.get("1.0", "end-1c"),
             }
-            visual = self.visual if self.visual else Path(self.scene.visual)
-            if visual.suffix.lower() in IMAGE and (fields["start_frame"] or fields["source_audio"]):
+            visual = self.visual or (self.scene and self.scene.visual)
+            if visual and Path(visual).suffix.lower() in IMAGE and (fields["start_frame"] or fields["source_audio"]):
                 raise EfirError("Для изображения сбросьте начальную позицию и исходный звук.")
             if self.visual:
                 fields["visual"] = self.project.import_media(self.visual)
+            elif studio and self.scene is None:
+                fields["visual"] = None
+            if studio:
+                fields["speech"] = self.speech.get("1.0", "end-1c")
             if self.voice:
                 fields["voice"] = self.project.import_media(self.voice, voice=True)
             elif self.clear_voice:
@@ -119,6 +129,8 @@ class SceneDialog(simpledialog.Dialog):
 
 
 class Studio:
+    project_type = Project
+
     def __init__(self, window):
         self.window = window
         self.project = None
@@ -146,8 +158,7 @@ class Studio:
         self.srt_button = self._button(bar, "Экспорт SRT", self.srt)
         ttk.Checkbutton(bar, text="Черновое разрешение", variable=self.draft).pack(side="right")
 
-        table = ttk.Frame(body)
-        table.pack(fill="both", expand=True)
+        table = self.scene_panel(body)
         self.scenes = ttk.Treeview(table, columns=("order", "title", "time", "audio"), show="headings", selectmode="browse")
         for name, title, width in (("order", "№", 46), ("title", "Сцена", 430),
                                    ("time", "Длительность", 125), ("audio", "Звук", 140)):
@@ -176,6 +187,11 @@ class Studio:
         self.cancel_button = self._button(footer, "Отменить экспорт", self.stop)
         self.output_button = self._button(footer, "Открыть MP4", self.open_output)
         self.refresh()
+
+    def scene_panel(self, body):
+        table = ttk.Frame(body)
+        table.pack(fill="both", expand=True)
+        return table
 
     @staticmethod
     def _button(frame, label, callback):
@@ -206,7 +222,7 @@ class Studio:
         if aspect is None:
             return
         try:
-            self.set_project(Project.create(Path(parent) / name, name, aspect.strip()))
+            self.set_project(self.project_type.create(Path(parent) / name, name, aspect.strip()))
         except (EfirError, OSError) as error:
             self.error(error)
 
@@ -214,7 +230,7 @@ class Studio:
         path = path or filedialog.askdirectory(title="Выберите папку проекта", parent=self.window)
         if path:
             try:
-                self.set_project(Project.open(path))
+                self.set_project(open_project(path))
             except (EfirError, OSError) as error:
                 self.error(error)
 
@@ -370,6 +386,8 @@ class Studio:
     def open_visual(self):
         scene = self.project.scenes[self.project.scene_index(self.selected())]
         try:
+            if scene.visual is None:
+                raise EfirError("Прикрепите клип или изображение через свойства сцены.")
             self.open_media(self.project.asset(scene.visual))
         except (EfirError, OSError) as error:
             self.error(error)
@@ -394,11 +412,13 @@ class Studio:
 
 
 def launch(project=None):
+    from .workspace import Workspace
+
     try:
         window = tk.Tk()
     except tk.TclError as error:
         raise EfirError(f"Не удалось открыть настольное окно: {error}") from error
-    studio = Studio(window)
+    studio = Workspace(window)
     if project is not None:
         window.after_idle(lambda: studio.open(project))
     window.mainloop()

@@ -115,7 +115,7 @@ class Scene:
     caption: str = ""
     notes: str = ""
 
-    def validate(self):
+    def validate(self, *, allow_missing_visual=False):
         if not isinstance(self.id, str) or not SCENE_ID.fullmatch(self.id):
             raise EfirError("Неверный идентификатор сцены.")
         if not all(isinstance(value, str) and "\x00" not in value
@@ -127,10 +127,14 @@ class Scene:
             raise EfirError("Начальная позиция должна быть от 0 до 600 секунд.")
         if self.fit not in ("contain", "cover") or type(self.source_audio) is not bool:
             raise EfirError("Неверный режим кадрирования или исходного звука.")
-        validate_ref(self.visual, {*VIDEO, *IMAGE})
+        if self.visual is None and allow_missing_visual:
+            if self.start_frame or self.source_audio:
+                raise EfirError("Для сцены без клипа сбросьте начальную позицию и исходный звук.")
+        else:
+            validate_ref(self.visual, {*VIDEO, *IMAGE})
         if self.voice is not None:
             validate_ref(self.voice, AUDIO)
-        if Path(self.visual).suffix in IMAGE and (self.start_frame or self.source_audio):
+        if self.visual is not None and Path(self.visual).suffix in IMAGE and (self.start_frame or self.source_audio):
             raise EfirError("Для изображения сбросьте начальную позицию и исходный звук.")
 
 
