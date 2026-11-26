@@ -58,9 +58,13 @@ jobs:
         shell: bash
         run: |
           mkdir -p workspace
-          chmod a+rwx workspace
+          export EFIR_UID="$(id -u)" EFIR_GID="$(id -g)"
           docker compose config --quiet
           docker compose build
-          docker compose run --rm -T -e EFIR_E2E_TEMP=/workspace --entrypoint python efir - +            < tests/test_cli_e2e.py
+          docker compose run --rm -T -e EFIR_E2E_TEMP=/workspace --entrypoint python efir - < tests/test_cli_e2e.py
           docker compose run --rm -T efir init /workspace/persistence --title Persistent
+          docker compose run --rm -T --entrypoint ffmpeg efir -v error -f lavfi -i color=blue:s=96x96 -frames:v 1 -threads:v 1 /workspace/fixture.png
+          docker compose run --rm -T efir add /workspace/persistence --title Scene --visual /workspace/fixture.png --duration 0.4
+          docker compose run --rm -T efir export /workspace/persistence /workspace/persistence.mp4 --draft
+          test -s workspace/persistence.mp4
           docker compose run --rm -T efir list /workspace/persistence
