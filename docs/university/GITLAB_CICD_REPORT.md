@@ -50,6 +50,18 @@ git log -1 --oneline
 
 Вкладка **Tests** показывает 0 выполненных тестов. JUnit, Cobertura и HTML появятся после выполнения заданий. Серверный CI Lint, версия GitLab, тип доступного runner и состояние Registry требуют доступа к соответствующим страницам или API. Наличие шести заданий подтверждает, что GitLab создал pipeline по конфигурации, но ничего не говорит о выполнении этих заданий.
 
-Проверить причину ожидания можно в job `lint` и в **Settings → CI/CD → Runners**. Для текущей конфигурации нужен доступный runner, принимающий задания без тегов на `main`. Если университет назначает задания через теги, используются выданные вузом теги. Для `package` нужен разрешённый способ собрать и запустить контейнер. [Настройка GitLab Runner](https://docs.gitlab.com/ci/runners/configure_runners/)
+## Подбор университетского runner
+
+Для [pipeline №811](https://vcs.uni-dubna.ru/KAV.24/efir-studio/-/pipelines/811) пользователь подтвердил `pending / stuck`. В настройках проекта включены Shared runners. Доступен Shared Runner №1 с тегами `cluster` и `kubernetes`; рядом показан предупреждающий значок. Specific runners отсутствуют. Для диагностики нужны текст предупреждения, состояние runner и значение **Run untagged jobs**. Теги сами по себе не показывают ни тип executor, ни возможность принять задание.
+
+Все задания теперь наследуют теги `cluster` и `kubernetes` из `default.tags`. Это устраняет несовпадение, если runner принимает только тегированные задания. Доступность проверяется назначением `lint` в новом pipeline. Тип executor подтверждается строкой `Preparing the "…" executor` в логе. Если `lint` по-прежнему ожидает назначения, нужно проверить, подходит ли runner для защищённой ветки `main`, и передать университетскому администратору предупреждение runner и сообщение из карточки job. [Подбор runner по тегам](https://docs.gitlab.com/ci/runners/configure_runners/#use-tags-to-run-jobs-on-different-platforms)
+
+## Проверка Kubernetes и сборки образа
+
+- Для `quality`, `unit`, `integration`, `e2e` и `coverage` нужен Linux-контейнер с указанным Python-образом. Установка пакетов в `integration` и `coverage` требует возможности запустить `apt-get` в контейнере и доступа к Debian и PyPI. Xvfb обслуживает тесты Tk. Журналы покажут, разрешены ли образы, сеть и установка пакетов политиками университета.
+- `package` отдельно проверяет связь с Docker daemon командой `docker info`, собирает образ и запускает в нём CLI E2E без сети. Для существующего сервиса Docker-in-Docker Kubernetes runner должен разрешать привилегированный контейнер сервиса. Строка о Kubernetes executor в `lint` этого разрешения не подтверждает. [Docker-in-Docker на Kubernetes](https://docs.gitlab.com/ci/docker/using_docker_build/#docker-in-docker-with-tls-enabled-in-kubernetes)
+- Если университет запрещает Docker-in-Docker, совместимые варианты нужно согласовать с администратором. Rootless BuildKit может собрать OCI-образ без Docker daemon при поддержке user namespaces и политик кластера. Для приёмки потребуется также разрешённый запуск именно этого образа с E2E, например на отдельном выделенном runner с разрешённым runtime. Если кластер уже предоставляет утверждённый runner для сборки и запуска контейнеров, `package` можно назначить на его тег. [Rootless BuildKit](https://docs.gitlab.com/ci/docker/using_buildkit/)
+
+Если университетский runner не может принять задания или собрать и запустить образ, действуйте по [плану Windows Runner](WINDOWS_RUNNER_FALLBACK.md).
 
 Проверки кода и контейнера на GitHub прошли отдельно. [GitHub Actions](https://github.com/KoznovaAV/efir-studio/actions/runs/45885051835) · [Методика и локальные результаты](TESTING_REPORT.md)

@@ -7,6 +7,9 @@ workflow:
 
 stages: [quality, unit, integration, e2e, coverage, package, release]
 
+default:
+  tags: [cluster, kubernetes]
+
 variables:
   PYTHONUTF8: '1'
   PIP_DISABLE_PIP_VERSION_CHECK: '1'
