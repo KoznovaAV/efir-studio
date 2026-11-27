@@ -10,10 +10,9 @@ import sqlite3
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-from .project import AUDIO, EfirError, Project, Scene, digest_file, project_lock, validate_ref
+from .project import AUDIO, SQLITE_MANIFEST, EfirError, Project, Scene, digest_file, project_lock, validate_ref
 
 
-DATABASE = "project.sqlite"
 MIGRATIONS = (
     (
         "CREATE TABLE revision (id INTEGER PRIMARY KEY, parent INTEGER REFERENCES revision, "
@@ -70,7 +69,7 @@ class StudioProject(Project):
 
     @property
     def database(self):
-        return self.inside(DATABASE)
+        return self.inside(SQLITE_MANIFEST)
 
     def document(self):
         return {"title": self.title, "aspect": self.aspect, "background": self.background,
@@ -175,7 +174,7 @@ class StudioProject(Project):
             raise EfirError("Выберите каталог вне исходного проекта.")
         with new_folder(destination) as stage:
             with closing(sqlite3.connect(self.database.as_uri() + "?mode=ro", uri=True)) as source:
-                with closing(sqlite3.connect(stage / DATABASE)) as target, target:
+                with closing(sqlite3.connect(stage / SQLITE_MANIFEST)) as target, target:
                     source.backup(target)
                     references = set()
                     for revision, document in target.execute("SELECT id, document FROM revision"):
@@ -237,7 +236,7 @@ def migrate(source, destination):
 
 def open_project(root):
     root = Path(root)
-    if (root / DATABASE).exists():
+    if (root / SQLITE_MANIFEST).exists():
         return StudioProject.open(root)
     return Project.open(root)
 

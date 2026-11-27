@@ -157,3 +157,70 @@ class WorkspaceTests(unittest.TestCase):
             self.assertTrue(dialog.validate())
         self.assertIsNone(dialog.result["visual"])
         self.assertEqual(dialog.result["speech"], "Текст озвучки.")
+
+    def test_cancelled_dialogs_and_legacy_controls(self):
+        studio = self.studio
+        with patch("efir.workspace.filedialog.askdirectory", return_value=""), patch(
+            "efir.workspace.filedialog.askopenfilename", return_value="",
+        ):
+            studio.migrate_project()
+            studio.backup()
+            studio.background()
+        with patch("efir.workspace.filedialog.askdirectory", return_value=str(self.root)), patch(
+            "efir.workspace.simpledialog.askstring", return_value="..",
+        ):
+            studio.migrate_project()
+            studio.backup()
+        self.assertFalse(studio.busy)
+        studio.open_recent(None)
+        studio.restore()
+        studio.voice()
+        studio.listen()
+        studio.task_action("open")
+        studio.resolve_plan(True)
+        studio.error.assert_not_called()
+        legacy = Project.create(self.root / "Old", "Оригинал")
+        studio.open(legacy.root)
+        studio.backup()
+        studio.background()
+        studio.task_action("retry")
+        self.assertEqual(studio.error.call_count, 3)
+        with patch.object(studio, "choose_output", return_value=None) as choose:
+            studio.render()
+        choose.assert_called_once_with(".mp4")
+
+    def test_switch_project_while_background_operation_is_running(self):
+        from threading import Event
+
+        studio = self.studio
+        other = StudioProject.create(self.root / "Другой", "Другой эфир")
+        ready = Event()
+        studio.start_work(ready.wait)
+        try:
+            studio.open(other.root)
+            self.assertEqual(studio.project.root, other.root)
+        finally:
+            ready.set()
+        self.pump(lambda: not studio.busy)
+        self.assertEqual(studio.project.root, other.root)
+        with patch.object(studio.window, "destroy") as destroy:
+            studio.start_work(lambda: None)
+            studio.close()
+            self.assertTrue(studio.closing)
+            self.pump(lambda: bool(destroy.call_count))
+            destroy.assert_called_once()
+
+    def test_missing_voice_engine_fails_only_voice_job(self):
+        studio = self.studio
+        scene = self.project.add(title="Без озвучки", frames=10, visual=None, speech="Вы в эфире")
+        self.project.save()
+        studio.open(self.project.root)
+        queue = Queue(studio.project)
+        task = queue.enqueue("voice", scene_id=scene.id, recipe=VoiceFixture.recipe)
+        with patch("efir.workspace.Piper.configured", side_effect=EfirError("Piper missing")):
+            self.pump(lambda: studio.task_rows.get(task, {}).get("state") == "failed")
+        self.assertIsNone(studio.project.scenes[0].voice)
+        studio.scenes.selection_set(scene.id)
+        with patch.object(studio, "open_media") as play:
+            studio.listen()
+        play.assert_not_called()

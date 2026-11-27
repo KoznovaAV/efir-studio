@@ -98,6 +98,7 @@ class CliEndToEnd(unittest.TestCase):
         self.assertEqual(self.cli("work", studio).strip(), job)
         complete = json.loads(self.cli("jobs", studio))
         self.assertEqual(complete["state"], "succeeded")
+        self.assertEqual(self.cli("queue-export", studio, "--draft").strip(), job)
         result = json.loads(complete["result"])
         self.assertEqual(result["encoded"], 2)
         output = studio / result["file"]
@@ -119,6 +120,13 @@ class CliEndToEnd(unittest.TestCase):
         self.cli("restore", copied, "2")
         self.assertIn("Восстановление ревизии 2", self.cli("history", copied))
         self.cli("background", copied)
+        (studio / newer["file"]).write_bytes(b"corrupted export")
+        self.assertNotEqual(self.cli("queue-export", studio, "--draft").strip(), newer_job)
+        failed_copy = subprocess.run([sys.executable, "-X", "utf8", "-m", "efir", "portable",
+                                      str(studio), str(self.root / "Повреждённый")],
+                                     capture_output=True, timeout=20)
+        self.assertNotEqual(failed_copy.returncode, 0)
+        self.assertIn("отсутствует или изменился", failed_copy.stderr.decode("utf-8"))
 
     def test_sqlite_command_errors_and_task_actions(self):
         studio = self.root / "Новый"

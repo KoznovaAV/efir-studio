@@ -74,6 +74,8 @@ class StoreTests(StudioFixture):
             restored.restore(99)
         with self.assertRaisesRegex(EfirError, "существует"):
             StudioProject.create(stale.root, "Дубликат")
+        with self.assertRaisesRegex(EfirError, "SQLite"):
+            Project.create(stale.root, "Дубликат v0.1")
         with self.assertRaisesRegex(EfirError, "без клипа"):
             restored.update(self.first.id, source_audio=True)
         with self.assertRaisesRegex(EfirError, "Реплика"):
@@ -131,7 +133,7 @@ class StoreTests(StudioFixture):
         second = active.enqueue("voice", scene_id=self.second.id, recipe=engine.recipe)
         active.claim(200)
         destination = self.path / "Backup"
-        self.assertEqual(self.project.portable(destination), destination)
+        self.assertEqual(self.project.portable(destination), destination.resolve())
         copied = StudioProject.open(destination)
         self.assertEqual(copied.scenes, self.project.scenes)
         self.assertTrue(copied.asset(old_voice).stat().st_size > 40)
@@ -215,8 +217,9 @@ os._exit(7)
         self.project.update(self.first.id, caption="Только субтитр")
         self.project.save()
         queue = Queue(self.project)
-        queue.enqueue("voice", scene_id=self.first.id, recipe=engine.recipe)
+        cached = queue.enqueue("voice", scene_id=self.first.id, recipe=engine.recipe)
         run_one(self.project, tts=engine)
+        self.assertEqual(queue.enqueue("voice", scene_id=self.first.id, recipe=engine.recipe), cached)
         self.assertEqual(len(engine.calls), 2)
         self.project.update(self.second.id, speech="Новая реплика длиннее.")
         self.project.save()
@@ -303,6 +306,19 @@ os._exit(7)
         self.assertIn("Истекло", queue.jobs()[0]["error"])
         self.assertIsNone(StudioProject.open(self.project.root).scenes[0].voice)
 
+    def test_expired_worker_cannot_commit_after_leasing_is_lost(self):
+        now = 100
+        queue = Queue(self.project, clock=lambda: now)
+        queue.enqueue("export")
+        previous = queue.claim(120)
+        now += LEASE + 1
+        self.assertFalse(queue.heartbeat(previous))
+        current = queue.claim(120)
+        with self.project.connect() as db:
+            queue.finish(db, previous, error="stale")
+        self.assertNotEqual(current["worker"], previous["worker"])
+        self.assertEqual(queue.jobs()[0]["state"], "running")
+
 
 class PlanTests(StudioFixture):
     def test_cli_confirmation_rejection_and_configured_voice(self):
@@ -377,6 +393,12 @@ class PlanTests(StudioFixture):
         revision, jobs = decision(self.project, plan_id, accept=True, recipe=VoiceFixture.recipe)
         self.assertEqual(len(jobs), 1)
         self.assertEqual(Queue(self.project).jobs()[0]["revision"], revision)
+
+    def test_plan_cannot_schedule_speech_after_erasing_it(self):
+        with self.assertRaisesRegex(EfirError, "без реплики"):
+            self.mock_proposal({"op": "edit", "scene": self.first.id, "speech": ""},
+                               {"op": "voice", "scene": self.first.id})
+        self.assertEqual(proposals(self.project), [])
 
     def test_ollama_protocol_uses_schema_and_redacts_media_paths(self):
         model_message = self.data({"op": "add", "title": "Передача", "frames": 400})
@@ -469,6 +491,9 @@ class PiperTests(StudioFixture):
             target.write_bytes(b"bad audio")
             with self.assertRaisesRegex(EfirError, "корректный WAV"):
                 engine.synthesize("text", target, cancel=Event())
+            wav(target, b"")
+            with self.assertRaisesRegex(EfirError, "корректный WAV"):
+                engine.synthesize("text", target, cancel=Event())
             child.returncode = 3
             with self.assertRaisesRegex(EfirError, "кодом 3"):
                 engine.synthesize("text", target, cancel=Event())
@@ -487,6 +512,13 @@ class PiperTests(StudioFixture):
             child.poll.return_value = None
             with self.assertRaisesRegex(EfirError, "время"):
                 engine.synthesize("text", target, cancel=Event())
+            child.kill.assert_called_once()
+        engine.timeout = 10
+        with patch("efir.tts.subprocess.Popen") as launch:
+            child = launch.return_value.__enter__.return_value
+            child.poll.return_value = None
+            with self.assertRaisesRegex(EfirError, "отменена"):
+                engine.synthesize("text", target, cancel=Mock(**{"is_set.side_effect": [False, True]}))
             child.kill.assert_called_once()
         cancel = Event()
         cancel.set()

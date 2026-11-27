@@ -20,6 +20,7 @@ IMAGE = {".png", ".jpg", ".jpeg"}
 AUDIO = {".wav": "wav", ".mp3": "mp3", ".flac": "flac", ".m4a": "mov"}
 ASSET = re.compile(r"[a-f0-9]{64}\.[a-z0-9]+")
 SCENE_ID = re.compile(r"[a-f0-9]{12}")
+SQLITE_MANIFEST = "project.sqlite"
 
 
 class EfirError(Exception):
@@ -197,6 +198,8 @@ class Project:
                 "scenes": [asdict(scene) for scene in self.scenes]}
         payload = (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
         with project_lock(self.inside(".project.lock")):
+            if (self.root / SQLITE_MANIFEST).exists():
+                raise EfirError("В каталоге уже хранится проект SQLite.")
             current = digest_file(target) if target.exists() else None
             if current != self._revision:
                 raise EfirError("Проект уже существует или изменился. Откройте его снова.")
