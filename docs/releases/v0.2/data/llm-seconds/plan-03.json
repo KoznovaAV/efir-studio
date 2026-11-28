@@ -1,0 +1,199 @@
+{
+  "case": 3,
+  "prompt": "Сделай сцену на четыре секунды с репликой «Мы в эфире»",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": []
+  },
+  "base_revision": 1,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "error": "Ollama вернул HTTP 500. Проверьте локальную модель.",
+  "unchanged_before_approval": true,
+  "seconds": 5.688,
+  "raw": null,
+  "samples": [
+    {
+      "seconds": 0.0,
+      "rss_mib": 94.32,
+      "available_mib": 4716.84,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.278,
+      "rss_mib": 195.37,
+      "available_mib": 4595.67,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.495,
+      "rss_mib": 144.85,
+      "available_mib": 4649.92,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.712,
+      "rss_mib": 113.69,
+      "available_mib": 4672.62,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.928,
+      "rss_mib": 688.54,
+      "available_mib": 4202.91,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.208,
+      "rss_mib": 711.44,
+      "available_mib": 4184.99,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.424,
+      "rss_mib": 752.67,
+      "available_mib": 4047.68,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.653,
+      "rss_mib": 752.68,
+      "available_mib": 4025.57,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.869,
+      "rss_mib": 752.69,
+      "available_mib": 4000.99,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.16,
+      "rss_mib": 744.14,
+      "available_mib": 4050.08,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.372,
+      "rss_mib": 879.93,
+      "available_mib": 3901.51,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.589,
+      "rss_mib": 909.62,
+      "available_mib": 3864.73,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.806,
+      "rss_mib": 924.52,
+      "available_mib": 3853.3,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 3.085,
+      "rss_mib": 924.7,
+      "available_mib": 3847.8,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 3.3,
+      "rss_mib": 925.27,
+      "available_mib": 3857.11,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 3.515,
+      "rss_mib": 925.28,
+      "available_mib": 3848.91,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 3.733,
+      "rss_mib": 925.91,
+      "available_mib": 3859.39,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 4.012,
+      "rss_mib": 917.65,
+      "available_mib": 3875.4,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 4.227,
+      "rss_mib": 918.58,
+      "available_mib": 3856.2,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 4.443,
+      "rss_mib": 918.58,
+      "available_mib": 3880.99,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 4.661,
+      "rss_mib": 918.58,
+      "available_mib": 3883.9,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 4.939,
+      "rss_mib": 918.58,
+      "available_mib": 3886.9,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 5.156,
+      "rss_mib": 918.59,
+      "available_mib": 3893.01,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 5.372,
+      "rss_mib": 918.59,
+      "available_mib": 3889.18,
+      "gpu_mib": 3793
+    },
+    {
+      "seconds": 5.589,
+      "rss_mib": 918.6,
+      "available_mib": 3889.89,
+      "gpu_mib": 3793
+    }
+  ],
+  "peak_rss_mib": 925.91,
+  "min_available_mib": 3847.8,
+  "peak_gpu_mib": 3793,
+  "sampled_cpu_seconds": 6.984
+}

@@ -1,0 +1,20 @@
+{
+  "series": "llm-exchange",
+  "case_count": 20,
+  "schema_and_project_state": 20,
+  "semantic_pass": 18,
+  "manual_review": {
+    "1": {
+      "passed": true,
+      "reason": "Six 15-second scenes have a coherent investigatory arc. Several draft narration fields still require copyediting and were not assessed as publishable dialogue."
+    },
+    "2": {
+      "passed": false,
+      "reason": "Both scenes have the requested runtime, but the responses are incomplete general commentary on repeat broadcasts instead of a two-scene repeating-broadcast story."
+    },
+    "20": {
+      "passed": false,
+      "reason": "The model describes an absurd line instead of providing the requested line."
+    }
+  }
+}

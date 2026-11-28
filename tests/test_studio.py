@@ -522,6 +522,11 @@ class PlanTests(StudioFixture):
         for query, count, length in examples:
             resolved = creation_budget(query, 0)
             self.assertEqual((resolved.count, resolved.seconds), (count, length))
+        unspecified = creation_budget("Создай две новые сцены о зимней записи", 2)
+        self.assertIsNone(unspecified.seconds)
+        variant = schema(2, 2, unspecified)["properties"]["operations"]["items"]["anyOf"][0]
+        self.assertNotIn("const", variant["properties"]["seconds"])
+        self.assertNotIn("position", variant["required"])
         for query in ("Озвучь сцену", "Создай набросок", "Создай 30 сцен", "Добавь сцену на 601 секунду",
                       "Добавь сцену и озвучь текущую"):
             self.assertIsNone(creation_budget(query, 2))
@@ -550,11 +555,52 @@ class PlanTests(StudioFixture):
         self.assertEqual((caption.scene, caption.field, caption.value), (2, "caption", "Мы тут"))
         self.assertFalse(literal_edit("Измени реплику сцены №1 на «Тишина», без озвучки", scenes).voice)
         for query in ("Привет", "Замени реплику", "Измени неизвестное на «Текст»",
+                      "Разбей реплику первой сцены на две строки «Тишина» и «Мы в эфире»",
+                      "Разбей субтитр в «Второй» на две строки без текста",
+                      "Разбей субтитр в «Второй» на две строки «Только одна»",
                       "Замени реплику первой и второй сцены на «Текст»",
                       "Замени реплику в «Несуществующая» на «Текст»",
                       "Замени реплику первой сцены на «Текст» и перемести её",
                       "Замени реплику первой сцены на «Текст» и озвучь вторую сцену"):
             self.assertIsNone(literal_edit(query, scenes))
+
+    def test_quoted_caption_lines_are_copied_as_caption(self):
+        from efir.assistant import from_model, literal_edit
+
+        query = "Разбей субтитр в «Второй» на три строки «Утро» и «Передача» и «Эфир»"
+        exact = literal_edit(query, self.project.scenes)
+        self.assertEqual((exact.scene, exact.field, exact.value), (2, "caption", "Утро\nПередача\nЭфир"))
+        document = from_model(self.project, self.data({"op": "edit", "scene": 2, "caption": exact.value}), exact=exact)
+        plan = self.mock_proposal(*document["operations"])
+        decision(self.project, plan, accept=True)
+        current = StudioProject.open(self.project.root)
+        self.assertEqual(current.scenes[1].speech, self.second.speech)
+        self.assertEqual(current.scenes[1].caption, exact.value)
+
+    def test_explicit_scene_exchange_keeps_other_positions(self):
+        from efir.assistant import explicit_swap, from_model, schema
+
+        self.project.add(title="Третья", frames=125, visual=None)
+        fourth = self.project.add(title="Четвёртая", frames=80, visual=None)
+        self.project.save()
+        order = explicit_swap("Поменяй местами первую сцену и четвертую сцену", 4)
+        self.assertEqual(order, (1, 4))
+        contract = schema(self.project.revision, 4, swap=order)["properties"]["operations"]
+        self.assertEqual(len(contract["items"]["anyOf"]), 1)
+        self.assertEqual(contract["items"]["anyOf"][0]["properties"]["other"]["const"], 4)
+        actual = from_model(self.project, self.data({"op": "swap", "scene": 1, "other": 4}), swap=order)
+        plan = self.mock_proposal(*actual["operations"])
+        before = self.project.scenes[:]
+        self.assertIn("↔ Четвёртая", preview_text(self.project, actual["operations"][0]))
+        decision(self.project, plan, accept=True)
+        after = StudioProject.open(self.project.root)
+        self.assertEqual(after.scenes, [fourth, before[1], before[2], before[0]])
+        with self.assertRaisesRegex(EfirError, "две разные"):
+            self.mock_proposal({"op": "swap", "scene": self.first.id, "other": self.first.id})
+        with self.assertRaisesRegex(EfirError, "запрошенному обмену"):
+            from_model(self.project, self.data({"op": "swap", "scene": 4, "other": 1}), swap=order)
+        self.assertIsNone(explicit_swap("Переставь вторую и вторую сцены", 4))
+        self.assertIsNone(explicit_swap("Переставь вторую и шестую сцены", 4))
 
 class PiperTests(StudioFixture):
     def setUp(self):

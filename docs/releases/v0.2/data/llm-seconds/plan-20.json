@@ -1,0 +1,352 @@
+{
+  "case": 20,
+  "prompt": "Добавь сцену под названием «Коммутатор» на 11 секунд с абсурдной репликой",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "bd5f87e99b35",
+        "title": "Вступление",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "6cb89631575c",
+        "title": "Радио",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "08ccecb115a1",
+        "title": "Финал",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      }
+    ]
+  },
+  "base_revision": 2,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "unchanged_before_approval": true,
+  "after": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "bd5f87e99b35",
+        "title": "Вступление",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "6cb89631575c",
+        "title": "Радио",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "08ccecb115a1",
+        "title": "Финал",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "2e3a51314456",
+        "title": "Коммутатор",
+        "visual": null,
+        "frames": 275,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Абсурдная реплика для коммутатора. Пример: «Коммутатор — это то, что делает интернет живым!» (смешно, но работает)."
+      },
+      {
+        "id": "203d6f98ad0c",
+        "title": "Коммутатор",
+        "visual": null,
+        "frames": 275,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Абсурдная реплика для коммутатора. Пример: «Коммутатор — это то, что делает интернет живым!» (смешно, но работает)."
+      }
+    ]
+  },
+  "revision": 3,
+  "jobs": [],
+  "seconds": 6.853,
+  "raw": {
+    "model": "qwen3:4b",
+    "created_at": "2026-11-28T14:37:51.2031704Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\n  \"base_revision\": 2,\n  \"operations\": [\n    {\n      \"op\": \"add\",\n      \"seconds\": 11.0,\n      \"title\": \"Коммутатор\",\n      \"speech\": \"Абсурдная реплика для коммутатора. Пример: «Коммутатор — это то, что делает интернет живым!» (смешно, но работает).\"\n      },\n      {\n        \"op\": \"add\",\n        \"seconds\": 11.0,\n        \"title\": \"Коммутатор\",\n        \"speech\": \"Абсурдная реплика для коммутатора. Пример: «Коммутатор — это то, что делает интернет живым!» (смешно, но работает).\"\n      }\n    ]\n  }"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 6816479400,
+    "load_duration": 2828463400,
+    "prompt_eval_count": 509,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 275313000,
+    "eval_count": 193,
+    "eval_duration": 3657841000
+  },
+  "samples": [
+    {
+      "seconds": 0.0,
+      "rss_mib": 101.0,
+      "available_mib": 4162.3,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.279,
+      "rss_mib": 101.19,
+      "available_mib": 4181.01,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.497,
+      "rss_mib": 203.74,
+      "available_mib": 4067.57,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.715,
+      "rss_mib": 373.71,
+      "available_mib": 3907.6,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.944,
+      "rss_mib": 438.69,
+      "available_mib": 3870.51,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.236,
+      "rss_mib": 508.25,
+      "available_mib": 3802.25,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.466,
+      "rss_mib": 439.8,
+      "available_mib": 3842.18,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.685,
+      "rss_mib": 753.78,
+      "available_mib": 3510.44,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.904,
+      "rss_mib": 753.79,
+      "available_mib": 3495.66,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.185,
+      "rss_mib": 753.81,
+      "available_mib": 3491.73,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.417,
+      "rss_mib": 749.83,
+      "available_mib": 3487.82,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.65,
+      "rss_mib": 880.1,
+      "available_mib": 3357.28,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.87,
+      "rss_mib": 905.85,
+      "available_mib": 3320.76,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.181,
+      "rss_mib": 922.44,
+      "available_mib": 3301.73,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.399,
+      "rss_mib": 925.21,
+      "available_mib": 3292.41,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.617,
+      "rss_mib": 926.01,
+      "available_mib": 3340.06,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.833,
+      "rss_mib": 926.54,
+      "available_mib": 3341.39,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.113,
+      "rss_mib": 926.55,
+      "available_mib": 3339.54,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.329,
+      "rss_mib": 926.55,
+      "available_mib": 3314.46,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.547,
+      "rss_mib": 918.6,
+      "available_mib": 3403.14,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.768,
+      "rss_mib": 920.96,
+      "available_mib": 3401.86,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.046,
+      "rss_mib": 918.54,
+      "available_mib": 3387.15,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.264,
+      "rss_mib": 933.86,
+      "available_mib": 3385.04,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.482,
+      "rss_mib": 925.88,
+      "available_mib": 3374.61,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.722,
+      "rss_mib": 925.88,
+      "available_mib": 3322.46,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.025,
+      "rss_mib": 925.88,
+      "available_mib": 3327.31,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.242,
+      "rss_mib": 925.89,
+      "available_mib": 3311.76,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.458,
+      "rss_mib": 925.89,
+      "available_mib": 3343.89,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.676,
+      "rss_mib": 925.89,
+      "available_mib": 3341.17,
+      "gpu_mib": 3795
+    }
+  ],
+  "peak_rss_mib": 933.86,
+  "min_available_mib": 3292.41,
+  "peak_gpu_mib": 3795,
+  "sampled_cpu_seconds": 8.094
+}

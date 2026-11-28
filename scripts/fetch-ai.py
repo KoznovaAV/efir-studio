@@ -31,11 +31,31 @@ def verified(path, total, checksum):
         return hashlib.file_digest(source, "sha256").hexdigest() == checksum
 
 
+def fetch_archive(url, target, total, checksum):
+    partial = target.with_name(target.name + ".download")
+    if verified(partial, total, checksum):
+        partial.replace(target)
+        return
+    print("ollama: downloading the official Windows archive", flush=True)
+    subprocess.run([
+        "curl.exe", "--fail", "--location", "--silent", "--show-error", "--retry", "2",
+        "--connect-timeout", "20", "--speed-limit", "1024", "--speed-time", "300",
+        "--continue-at", "-", "--output", str(partial), url,
+    ], check=True)
+    if not verified(partial, total, checksum):
+        raise RuntimeError("ollama: archive SHA-256 mismatch")
+    partial.replace(target)
+
+
 def fetch(name, workers):
     url, target, total, checksum = ARTIFACTS[name]
     target.parent.mkdir(parents=True, exist_ok=True)
     if verified(target, total, checksum):
         print(f"{name}: verified existing artifact ({total} bytes)", flush=True)
+        return
+    if name == "ollama":
+        fetch_archive(url, target, total, checksum)
+        print(f"{name}: verified {total} bytes, SHA-256 {checksum}", flush=True)
         return
     parts = target.with_name(target.name + ".parts")
     parts.mkdir(exist_ok=True)

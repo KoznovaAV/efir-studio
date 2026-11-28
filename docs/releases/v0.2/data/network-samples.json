@@ -1,0 +1,242 @@
+[
+  {
+    "time": 1795877784.983,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877785.488,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877785.993,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877786.497,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877787.002,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877787.507,
+    "observed_processes": 2,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877788.012,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877788.518,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877789.021,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877789.529,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877790.035,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877790.539,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877791.043,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877791.548,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877792.058,
+    "observed_processes": 2,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877792.565,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877793.07,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877793.576,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877794.08,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877794.585,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877795.091,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877795.597,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877796.105,
+    "observed_processes": 2,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877796.612,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877797.117,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877797.623,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877798.129,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877798.633,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877799.137,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  },
+  {
+    "time": 1795877799.643,
+    "observed_processes": 1,
+    "external_connections": 0,
+    "listeners": [
+      "127.0.0.1:11434"
+    ]
+  }
+]

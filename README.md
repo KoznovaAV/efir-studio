@@ -1,5 +1,7 @@
 # EFIR Studio
 
+Локальный AI-профиль Windows устанавливается командой `pwsh -File scripts/setup-ai.ps1`, затем запускается через `pwsh -File scripts/start-studio.ps1`. [Настройка Ollama и Piper](docs/releases/v0.2/AI_SETUP_GUIDE.md).
+
 EFIR Studio собирает короткие ролики из сцен. Рабочая ветка v0.2 добавляет планы сценария через локальный Ollama, редактирование в Tk, историю SQLite, очередь озвучки Piper и экспорт FFmpeg. В сцену можно импортировать свой клип, изображение и озвучку. Ручная сборка и экспорт работают после установки Python и FFmpeg без учётной записи.
 
 v0.2 проходит приёмку. Зафиксированные прогоны и проверка качества AI описаны в [чек-листе v0.2](docs/releases/v0.2/RELEASE_CHECKLIST.md). Установка движков и веса отделены от EFIR. [Подключение движков](docs/releases/v0.2/USER_GUIDE.md).

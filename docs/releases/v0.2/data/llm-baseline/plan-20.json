@@ -1,0 +1,290 @@
+{
+  "case": 20,
+  "prompt": "Добавь сцену под названием «Коммутатор» на 11 секунд с абсурдной репликой",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "7cb15d6f3bf7",
+        "title": "Вступление",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "65f9d0ef28cc",
+        "title": "Радио",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "b37a5125cf71",
+        "title": "Финал",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      }
+    ]
+  },
+  "base_revision": 2,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "unchanged_before_approval": true,
+  "after": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "7cb15d6f3bf7",
+        "title": "Коммутатор",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "65f9d0ef28cc",
+        "title": "Коммутатор",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "b37a5125cf71",
+        "title": "Коммутатор",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      }
+    ]
+  },
+  "revision": 3,
+  "jobs": [],
+  "seconds": 5.383,
+  "raw": {
+    "model": "qwen3:4b",
+    "created_at": "2026-11-28T14:33:14.1936144Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\n  \"base_revision\": 2,\n  \"operations\": [\n    {\n      \"op\": \"edit\",\n      \"scene\": \"7cb15d6f3bf7\",\n      \"title\": \"Коммутатор\"\n    },\n    {\n      \"op\": \"edit\",\n      \"scene\": \"65f9d0ef28cc\",\n      \"title\": \"Коммутатор\"\n    },\n    {\n      \"op\": \"edit\",\n      \"scene\": \"b37a5125cf71\",\n      \"title\": \"Коммутатор\"\n    }\n  ]\n}"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 5347258800,
+    "load_duration": 2660189900,
+    "prompt_eval_count": 735,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 328655000,
+    "eval_count": 133,
+    "eval_duration": 2342928000
+  },
+  "samples": [
+    {
+      "seconds": 0.0,
+      "rss_mib": 95.04,
+      "available_mib": 4725.91,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.282,
+      "rss_mib": 100.03,
+      "available_mib": 4718.45,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.514,
+      "rss_mib": 353.26,
+      "available_mib": 4449.22,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.728,
+      "rss_mib": 276.95,
+      "available_mib": 4539.28,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.946,
+      "rss_mib": 436.64,
+      "available_mib": 4445.8,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.224,
+      "rss_mib": 696.96,
+      "available_mib": 4193.12,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.44,
+      "rss_mib": 690.16,
+      "available_mib": 4209.79,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.656,
+      "rss_mib": 752.2,
+      "available_mib": 4045.89,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.871,
+      "rss_mib": 752.24,
+      "available_mib": 4030.37,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.154,
+      "rss_mib": 752.28,
+      "available_mib": 4011.14,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.384,
+      "rss_mib": 805.79,
+      "available_mib": 3960.11,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.598,
+      "rss_mib": 879.3,
+      "available_mib": 3880.46,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.817,
+      "rss_mib": 911.79,
+      "available_mib": 3848.12,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 3.127,
+      "rss_mib": 922.12,
+      "available_mib": 3839.95,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 3.343,
+      "rss_mib": 922.14,
+      "available_mib": 3877.45,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 3.556,
+      "rss_mib": 924.29,
+      "available_mib": 3878.41,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 3.774,
+      "rss_mib": 924.3,
+      "available_mib": 3875.71,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 4.053,
+      "rss_mib": 918.72,
+      "available_mib": 3877.2,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 4.269,
+      "rss_mib": 918.72,
+      "available_mib": 3878.59,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 4.487,
+      "rss_mib": 918.72,
+      "available_mib": 3876.8,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 4.703,
+      "rss_mib": 918.73,
+      "available_mib": 3880.44,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 4.979,
+      "rss_mib": 918.73,
+      "available_mib": 3882.46,
+      "gpu_mib": 3797
+    },
+    {
+      "seconds": 5.196,
+      "rss_mib": 918.73,
+      "available_mib": 3878.27,
+      "gpu_mib": 3797
+    }
+  ],
+  "peak_rss_mib": 924.3,
+  "min_available_mib": 3839.95,
+  "peak_gpu_mib": 3797,
+  "sampled_cpu_seconds": 6.75
+}

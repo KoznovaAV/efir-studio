@@ -21,10 +21,12 @@ OPERATIONS = {
     "add": ({**FIELDS, "position": POSITION}, ("title", "frames")),
     "edit": ({"scene": ID, **FIELDS}, ("scene",)),
     "move": ({"scene": ID, "position": POSITION}, ("scene", "position")),
+    "swap": ({"scene": ID, "other": ID}, ("scene", "other")),
     "voice": ({"scene": ID}, ("scene",)),
     "export": ({}, ()),
 }
 LABELS = {"add": "Добавить сцену", "edit": "Изменить сцену", "move": "Переместить сцену",
+          "swap": "Поменять сцены местами",
           "voice": "Поставить озвучку в очередь", "export": "Поставить черновой экспорт в очередь"}
 FIELD_LABELS = {"title": "Название", "frames": "Кадры", "speech": "Реплика", "caption": "Субтитры",
                 "notes": "Заметки", "position": "Позиция"}
@@ -52,24 +54,32 @@ class LiteralEdit:
 
 def literal_edit(prompt, scenes):
     """Lock exact replacements quoted by the user to one identifiable scene."""
-    matched = re.match(r"^(?P<verb>измени|замени|исправь|переименуй|поменяй)\b(?P<rest>.+)$", prompt, re.I | re.S)
+    matched = re.match(r"^(?P<verb>измени|замени|исправь|переименуй|поменяй|разбей)\b(?P<rest>.+)$", prompt, re.I | re.S)
     if not matched:
         return None
     rest = matched["rest"]
-    replacement = re.search(r"\b(?:на|в)\s+«([^»]+)»", rest, re.I)
     quoted = list(re.finditer(r"«([^»]+)»", rest))
-    if replacement is None or not quoted or len(quoted) > 2:
-        return None
-    displayed = quoted[-1][1]
-    if not re.search(r"\b(?:на|в)\s*$", rest[:quoted[-1].start()], re.I):
-        return None
-    before = rest[:quoted[-1].start()].casefold()
+    verb = matched["verb"].casefold()
+    if verb == "разбей":
+        separator = re.search(r"\bна\s+(?:\d+|[а-яё]+)\s+строк[иу]?\s*«", rest, re.I)
+        if not separator:
+            return None
+        lines = [item[1] for item in quoted if item.start() >= separator.end() - 1]
+        if len(lines) < 2:
+            return None
+        displayed = "\n".join(lines)
+        before = rest[:separator.start()].casefold()
+    else:
+        if not 1 <= len(quoted) <= 2 or not re.search(r"\b(?:на|в)\s*$", rest[:quoted[-1].start()], re.I):
+            return None
+        displayed = quoted[-1][1]
+        before = rest[:quoted[-1].start()].casefold()
     after = rest[quoted[-1].end():].casefold()
     if re.search(r"\bи\b", re.sub(r"«[^»]*»", "", before)):
         return None
     if re.search(r"\b(?:перемести|удали|сократи|продли|экспортируй|переименуй|измени|замени)\b", after):
         return None
-    if matched["verb"].casefold() == "переименуй" or re.search(r"\bназвани[ея]\b", before):
+    if verb == "переименуй" or re.search(r"\bназвани[ея]\b", before):
         field = "title"
     elif re.search(r"\bреплик[ауи]\b", before):
         field = "speech"
@@ -77,17 +87,19 @@ def literal_edit(prompt, scenes):
         field = "caption"
     else:
         return None
-    if not len(displayed) <= MODEL_TEXT_MAX[field]:
+    if len(displayed) > MODEL_TEXT_MAX[field] or (verb == "разбей" and field != "caption"):
         return None
     targets = []
     ordinals = ("перв", "втор", "треть", "четв[её]рт", "пят", "шест")
     for index, scene in enumerate(scenes, 1):
-        named = len(quoted) == 2 and scene.title.casefold() == quoted[0][1].casefold()
+        title = scene.title.casefold()
+        named = f"«{title}»" in before
+        genitive = re.search(rf"\bсубтитр[ыа]?\s+{re.escape(title)}а\b", before)
         numbered = re.search(rf"\bсцен[аеыу]\s*№?\s*{index}\b", before)
         in_order = index <= len(ordinals) and re.search(
             rf"\b{ordinals[index - 1]}(?:ую|ой|ей|ю|ая|яя)\s+сцен[аеыу]\b", before,
         )
-        if named or numbered or in_order:
+        if named or genitive or numbered or in_order:
             targets.append(index)
     if len(targets) != 1:
         return None
@@ -97,6 +109,20 @@ def literal_edit(prompt, scenes):
     if voice and re.search(r"\bсцен[а-я]+\b", after):
         return None
     return LiteralEdit(targets[0], field, displayed, voice)
+
+
+def explicit_swap(prompt, scene_count):
+    ordinals = ("первую", "вторую", "третью", "четвёртую", "пятую", "шестую")
+    alias = "|".join(ordinals)
+    clean = prompt.casefold().replace("четвертую", "четвёртую")
+    match = re.fullmatch(
+        rf"(?:переставь|поменяй местами)\s+({alias})(?:\s+сцену)?\s+и\s+({alias})(?:\s+сцен[уы])?[.!]?",
+        clean,
+    )
+    if not match:
+        return None
+    first, second = (ordinals.index(word) + 1 for word in match.groups())
+    return (first, second) if first != second and max(first, second) <= scene_count else None
 
 
 def creation_budget(prompt, scene_count):
@@ -141,18 +167,20 @@ def object_schema(properties, required):
             "additionalProperties": False}
 
 
-def schema(revision, scene_count, budget=None, exact=None):
+def schema(revision, scene_count, budget=None, exact=None, swap=None):
     variants = []
     for kind, (fields, required) in OPERATIONS.items():
         if (budget or not scene_count) and kind != "add":
             continue
         if exact and kind != "edit" and not (exact.voice and kind == "voice"):
             continue
+        if swap and kind != "swap":
+            continue
         model_fields = {"op": {"type": "string", "const": kind}}
         for field, rule in fields.items():
             if field == "frames":
                 model_fields["seconds"] = {"type": "number", "minimum": 1 / FPS, "maximum": MAX_FRAMES / FPS}
-            elif field == "scene":
+            elif field in ("scene", "other"):
                 model_fields[field] = {"type": "integer", "enum": list(range(1, scene_count + 1))}
             elif field in MODEL_TEXT_MAX:
                 model_fields[field] = {**rule, "maxLength": MODEL_TEXT_MAX[field]}
@@ -172,10 +200,15 @@ def schema(revision, scene_count, budget=None, exact=None):
             if kind == "edit":
                 model_fields[exact.field] = {"type": "string", "const": exact.value}
                 model_required += (exact.field,)
+        if swap:
+            for key, number in zip(("scene", "other"), swap, strict=True):
+                model_fields[key] = {"type": "integer", "const": number}
         variants.append(object_schema(model_fields, model_required))
     lower, upper = (budget.count, budget.count) if budget else (1, 24)
     if exact:
         lower = upper = 2 if exact.voice else 1
+    if swap:
+        lower = upper = 1
     return object_schema(
         {"base_revision": {"type": "integer", "const": revision},
          "operations": {"type": "array", "minItems": lower, "maxItems": upper, "items": {"anyOf": variants}}},
@@ -183,18 +216,18 @@ def schema(revision, scene_count, budget=None, exact=None):
     )
 
 
-def from_model(project, data, budget=None, exact=None):
+def from_model(project, data, budget=None, exact=None, swap=None):
     if not isinstance(data, dict) or not isinstance(data.get("operations"), list):
         raise EfirError("Ollama не вернул операции.")
     scene_ids = [scene.id for scene in project.scenes[:24]]
     for operation in data["operations"]:
         if not isinstance(operation, dict) or "frames" in operation:
             raise EfirError("Ответ Ollama должен задавать длительность числом секунд.")
-        if "scene" in operation:
-            position = operation["scene"]
+        for field in operation.keys() & {"scene", "other"}:
+            position = operation[field]
             if type(position) is not int or not 1 <= position <= len(scene_ids):
                 raise EfirError("Ollama указал номер вне списка доступных сцен.")
-            operation["scene"] = scene_ids[position - 1]
+            operation[field] = scene_ids[position - 1]
         if any(isinstance(value, str) and len(value) > MODEL_TEXT_MAX[key]
                for key, value in operation.items() if key in MODEL_TEXT_MAX):
             raise EfirError("Текст операции превышает ограничение схемы Ollama.")
@@ -218,6 +251,9 @@ def from_model(project, data, budget=None, exact=None):
             expected.append({"op": "voice", "scene": target})
         if data["operations"] != expected:
             raise EfirError("План не соответствует точной правке в кавычках.")
+    if swap and data["operations"] != [{"op": "swap", "scene": scene_ids[swap[0] - 1],
+                                         "other": scene_ids[swap[1] - 1]}]:
+        raise EfirError("План не соответствует запрошенному обмену сцен.")
     return data
 
 
@@ -245,7 +281,7 @@ def validate(snapshot, data):
                 valid = type(value) is int and field["minimum"] <= value <= field.get("maximum", MAX_FRAMES)
             else:
                 valid = isinstance(value, str) and "\x00" not in value and len(value) <= field.get("maxLength", 1600)
-                if name == "scene":
+                if name in ("scene", "other"):
                     valid = valid and SCENE_ID.fullmatch(value)
             if not valid:
                 raise EfirError(f"Недопустимое поле плана: {name}.")
@@ -268,6 +304,11 @@ def execute(snapshot, operations):
             snapshot.update(scene, **fields)
         elif kind == "move":
             snapshot.move(scene, fields["position"])
+        elif kind == "swap":
+            first, second = snapshot.scene_index(scene), snapshot.scene_index(fields["other"])
+            if first == second:
+                raise EfirError("Для перестановки выберите две разные сцены.")
+            snapshot.scenes[first], snapshot.scenes[second] = snapshot.scenes[second], snapshot.scenes[first]
         elif kind == "voice":
             if not snapshot.scenes[snapshot.scene_index(scene)].speech.strip():
                 raise EfirError("В плане озвучки есть сцена без реплики.")
@@ -325,7 +366,8 @@ class Ollama:
                    for i, s in enumerate(project.scenes[:24], 1)]
         budget = creation_budget(prompt, len(context))
         exact = literal_edit(prompt, project.scenes[:24])
-        contract = schema(project.revision, len(context), budget, exact)
+        swap = explicit_swap(prompt, len(context))
+        contract = schema(project.revision, len(context), budget, exact, swap)
         response = self.request("/api/chat", {
             "model": name, "stream": False, "think": False, "keep_alive": 0,
             "format": contract,
@@ -345,7 +387,7 @@ class Ollama:
                     "Длительность всегда в секундах, без преобразований. В JSON пиши десятичную точку. "
                     "В edit, move, voice укажи scene равным number нужной сцены из scenes_in_order. "
                     "Исходная первая сцена — scene:1, вторая — scene:2. Эти номера неизменны в рамках ответа. "
-                    "move ставит исходную сцену scene в новую position. При обмене проверь итоговый порядок. "
+                    "move ставит исходную сцену scene в новую position. swap меняет местами scene и other. "
                     "Текст в кавычках копируй дословно в нужное поле. voice заказывает озвучку. "
                     "export заказывает черновой MP4, только если этого попросили. "
                     f"Текущая ревизия {project.revision}."
@@ -356,6 +398,7 @@ class Ollama:
                     "required_seconds_per_new_scene": budget.seconds if budget else None,
                     "literal_edit": ({"scene": exact.scene, "field": exact.field, "value": exact.value,
                                       "then_voice": exact.voice} if exact else None),
+                    "swap": list(swap) if swap else None,
                 })},
             ],
         })
@@ -363,7 +406,7 @@ class Ollama:
             data = json.loads(response["message"]["content"])
         except (KeyError, TypeError, ValueError, RecursionError) as error:
             raise EfirError("Ollama не вернул машиночитаемый план.") from error
-        return from_model(project, data, budget, exact)
+        return from_model(project, data, budget, exact, swap)
 
 
 def propose(project, engine, prompt):
@@ -416,5 +459,7 @@ def preview_text(project, operation):
     label = LABELS[kind]
     if "scene" in operation:
         label += f" · {project.scenes[project.scene_index(operation['scene'])].title}"
+    if "other" in operation:
+        label += f" ↔ {project.scenes[project.scene_index(operation['other'])].title}"
     return "\n".join([label, *(f"  {FIELD_LABELS[key]} — {value}" for key, value in operation.items()
                               if key in FIELD_LABELS)])

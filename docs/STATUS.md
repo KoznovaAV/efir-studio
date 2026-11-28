@@ -1,5 +1,11 @@
 # Состояние EFIR Studio
 
+## 28 ноября 2026 года · реальная AI-приёмка
+
+Проверены закреплённые Ollama 0.40.19, Qwen3 4B Q4_K_M и Piper 1.8.0 с Denis rdh. Новый 96-секундный выпуск прошёл чат Tk, подтверждение, синтез, выборочную регенерацию и переносимый экспорт. [Отчёт AI-приёмки](releases/v0.2/AI_ACCEPTANCE_REPORT.md) · [пилот](releases/v0.2/PILOT_REPORT.md) · [измерения](releases/v0.2/RESOURCE_BENCHMARK.md).
+
+[PR №4](https://github.com/KoznovaAV/efir-studio/pull/4) остаётся черновиком до закрытия [чек-листа](releases/v0.2/RELEASE_CHECKLIST.md). Девять оригинальных WAV и два бланка готовы. Оценки слушателей ожидаются.
+
 ## 27 ноября 2026 года · v0.2 в разработке
 
 Ветка `codex/efir-studio-v0.2` основана на PR №3. Реализованы SQLite-ревизии, миграция с копированием исходников, очередь с сохранением состояния, локальные адаптеры Ollama и Piper, интерфейс с предпросмотром плана и отменой правок через историю. GitHub Actions прошёл на Windows, Ubuntu и Docker. Подготовлен авторский 96-секундный черновик «ЭФИР 03:33» с озвучкой Windows. Выпуск v0.2 ждёт проверки моделей на ноутбуке и оценки двух слушателей. [PR №4](https://github.com/KoznovaAV/efir-studio/pull/4), [приёмка](releases/v0.2/RELEASE_CHECKLIST.md), [пилот](releases/v0.2/PILOT_REPORT.md), [отчёт тестов](releases/v0.2/TEST_REPORT.md).

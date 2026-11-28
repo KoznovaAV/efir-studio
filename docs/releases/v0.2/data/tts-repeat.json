@@ -1,0 +1,140 @@
+[
+  {
+    "trial": 1,
+    "seconds": 2.55690379999578,
+    "wav_seconds": 6.350657596371882,
+    "bytes": 280108,
+    "peak_rss_mib": 201.28,
+    "min_available_mib": 4145.62,
+    "peak_gpu_mib": 0,
+    "sampled_cpu_seconds": 4.594,
+    "samples": [
+      {
+        "seconds": 0.001,
+        "rss_mib": 104.07,
+        "available_mib": 4227.39,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 1.867,
+        "rss_mib": 179.0,
+        "available_mib": 4166.79,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 2.14,
+        "rss_mib": 179.33,
+        "available_mib": 4151.59,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 2.354,
+        "rss_mib": 201.28,
+        "available_mib": 4145.62,
+        "gpu_mib": 0
+      }
+    ]
+  },
+  {
+    "trial": 2,
+    "seconds": 1.3634656000649557,
+    "wav_seconds": 6.397097505668934,
+    "bytes": 282156,
+    "peak_rss_mib": 206.85,
+    "min_available_mib": 4148.09,
+    "peak_gpu_mib": 0,
+    "sampled_cpu_seconds": 4.812,
+    "samples": [
+      {
+        "seconds": 0.0,
+        "rss_mib": 34.55,
+        "available_mib": 4275.6,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.257,
+        "rss_mib": 68.32,
+        "available_mib": 4250.66,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.469,
+        "rss_mib": 94.35,
+        "available_mib": 4241.69,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.684,
+        "rss_mib": 177.73,
+        "available_mib": 4165.31,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.899,
+        "rss_mib": 178.97,
+        "available_mib": 4164.49,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 1.161,
+        "rss_mib": 206.85,
+        "available_mib": 4148.09,
+        "gpu_mib": 0
+      }
+    ]
+  },
+  {
+    "trial": 3,
+    "seconds": 1.374030000064522,
+    "wav_seconds": 6.431927437641724,
+    "bytes": 283692,
+    "peak_rss_mib": 202.25,
+    "min_available_mib": 4131.96,
+    "peak_gpu_mib": 0,
+    "sampled_cpu_seconds": 4.625,
+    "samples": [
+      {
+        "seconds": 0.0,
+        "rss_mib": 30.12,
+        "available_mib": 4275.28,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.256,
+        "rss_mib": 65.36,
+        "available_mib": 4252.68,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.468,
+        "rss_mib": 93.46,
+        "available_mib": 4222.59,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.681,
+        "rss_mib": 177.87,
+        "available_mib": 4148.84,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 0.895,
+        "rss_mib": 179.28,
+        "available_mib": 4158.56,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 1.154,
+        "rss_mib": 202.25,
+        "available_mib": 4131.96,
+        "gpu_mib": 0
+      },
+      {
+        "seconds": 1.367,
+        "rss_mib": 27.52,
+        "available_mib": 4266.52,
+        "gpu_mib": 0
+      }
+    ]
+  }
+]

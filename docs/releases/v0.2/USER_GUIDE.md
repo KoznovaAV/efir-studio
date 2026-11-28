@@ -1,5 +1,7 @@
 # Руководство EFIR Studio v0.2
 
+Для настройки на Windows используйте [установщик и лаунчер](AI_SETUP_GUIDE.md).
+
 Нужны Python 3.11+ с Tk и FFmpeg с libx264 и AAC. Для Windows из корня репозитория:
 
 ```powershell
