@@ -1,0 +1,272 @@
+{
+  "case": 15,
+  "prompt": "Озвучь только вторую сцену",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "79b1409cee4f",
+        "title": "Вступление",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "3c2da9beef44",
+        "title": "Радио",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "2001f2d77b0e",
+        "title": "Финал",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      }
+    ]
+  },
+  "base_revision": 2,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "think": false,
+  "operations": [
+    {
+      "op": "voice",
+      "scene": "3c2da9beef44"
+    }
+  ],
+  "unchanged_before_approval": true,
+  "after": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "79b1409cee4f",
+        "title": "Вступление",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "3c2da9beef44",
+        "title": "Радио",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      },
+      {
+        "id": "2001f2d77b0e",
+        "title": "Финал",
+        "visual": "9ab7536c501d07a7fd69770ce7c93df2d2e32180794432f01a12a9d737ca6912.png",
+        "frames": 250,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "Эфир",
+        "notes": "",
+        "speech": "Мы начинаем передачу."
+      }
+    ]
+  },
+  "revision": 2,
+  "jobs": [
+    {
+      "id": "4a91b50e74f640bdbd272a91032eea5a",
+      "kind": "voice",
+      "revision": 2,
+      "state": "queued",
+      "attempt": 0,
+      "progress": "",
+      "error": null,
+      "result": null
+    }
+  ],
+  "seconds": 3.935,
+  "raw": {
+    "model": "qwen3:4b",
+    "created_at": "2026-11-28T14:52:19.0128587Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\n  \"base_revision\": 2,\n  \"operations\": [\n    {\n      \"op\": \"voice\",\n      \"scene\": 2\n    }\n  ]\n}"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 3848539700,
+    "load_duration": 2820125300,
+    "prompt_eval_count": 560,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 317049000,
+    "eval_count": 36,
+    "eval_duration": 688128000
+  },
+  "samples": [
+    {
+      "seconds": 0.0,
+      "rss_mib": 92.12,
+      "available_mib": 3769.04,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.29,
+      "rss_mib": 114.62,
+      "available_mib": 3762.9,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.509,
+      "rss_mib": 92.12,
+      "available_mib": 3783.47,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.727,
+      "rss_mib": 299.68,
+      "available_mib": 3592.07,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.957,
+      "rss_mib": 495.97,
+      "available_mib": 3438.75,
+      "gpu_mib": 9
+    },
+    {
+      "seconds": 1.237,
+      "rss_mib": 464.7,
+      "available_mib": 3444.94,
+      "gpu_mib": 9
+    },
+    {
+      "seconds": 1.456,
+      "rss_mib": 438.61,
+      "available_mib": 3442.36,
+      "gpu_mib": 9
+    },
+    {
+      "seconds": 1.674,
+      "rss_mib": 752.55,
+      "available_mib": 3124.86,
+      "gpu_mib": 9
+    },
+    {
+      "seconds": 1.894,
+      "rss_mib": 752.57,
+      "available_mib": 3102.18,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.175,
+      "rss_mib": 752.58,
+      "available_mib": 3092.04,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.395,
+      "rss_mib": 743.82,
+      "available_mib": 3094.08,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.612,
+      "rss_mib": 879.52,
+      "available_mib": 2955.17,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.828,
+      "rss_mib": 909.45,
+      "available_mib": 2925.06,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.171,
+      "rss_mib": 921.62,
+      "available_mib": 2894.85,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.389,
+      "rss_mib": 924.49,
+      "available_mib": 2924.98,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.605,
+      "rss_mib": 925.23,
+      "available_mib": 2918.85,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.822,
+      "rss_mib": 357.92,
+      "available_mib": 3478.23,
+      "gpu_mib": 3113
+    }
+  ],
+  "peak_rss_mib": 925.23,
+  "min_available_mib": 2894.85,
+  "peak_gpu_mib": 3791,
+  "sampled_cpu_seconds": 4.719
+}

@@ -1,0 +1,15 @@
+{
+  "cache_seconds": 0.019,
+  "reused_seconds": 0.004,
+  "regenerate_scene_2_seconds": 1.418,
+  "assets_before": [
+    "bd1eca688122577f06a90d4b98907d75fbb1fae1ec96b98043d30ff2c48cca1e.wav",
+    "bbfd85f31728b4cffad92ce5476c2bd2cbed91aae8577941300951d07d119f5c.wav"
+  ],
+  "assets_after": [
+    "bd1eca688122577f06a90d4b98907d75fbb1fae1ec96b98043d30ff2c48cca1e.wav",
+    "730230ed72d1d2f97bb006fdfa4a47f735af33ef053d798ca81f4abe200b4716.wav"
+  ],
+  "fast_seconds": 5.723718820861678,
+  "cancelled": true
+}

@@ -1,6 +1,7 @@
 """Black-box CLI workflow. This file also runs directly inside the image."""
 
 from array import array
+import json
 import os
 from pathlib import Path
 import shutil
@@ -80,6 +81,63 @@ class CliEndToEnd(unittest.TestCase):
         srt = self.root / "Субтитры.srt"
         self.cli("srt", project, srt)
         self.assertIn("00:00:00,400 --> 00:00:00,880", srt.read_text(encoding="utf-8"))
+
+    def test_sqlite_migration_queued_export_and_portable_copy(self):
+        image, video, voice = self.assets()
+        legacy, studio, copied = (self.root / name for name in ("Старый", "Студия", "Перенос"))
+        self.cli("init", legacy, "--title", "В эфире")
+        self.cli("add", legacy, "--title", "Титр", "--visual", image, "--duration", "0.40",
+                 "--caption", "Начинаем эфир.")
+        scene = self.cli("add", legacy, "--title", "Студия", "--visual", video, "--duration", "0.60",
+                         "--caption", "Движение и звук.", "--voice", voice).strip()
+        self.cli("migrate", legacy, studio)
+        self.assertTrue((legacy / "project.json").is_file())
+        self.assertFalse((studio / "project.json").exists())
+        self.cli("edit", studio, scene, "--speech", "Готово к записи.")
+        job = self.cli("queue-export", studio, "--draft").strip()
+        self.assertEqual(self.cli("work", studio).strip(), job)
+        complete = json.loads(self.cli("jobs", studio))
+        self.assertEqual(complete["state"], "succeeded")
+        self.assertEqual(self.cli("queue-export", studio, "--draft").strip(), job)
+        result = json.loads(complete["result"])
+        self.assertEqual(result["encoded"], 2)
+        output = studio / result["file"]
+        self.verify(output, 25, "00:00:01,000")
+
+        self.cli("background", studio, voice)
+        newer_job = self.cli("queue-export", studio, "--draft").strip()
+        self.assertNotEqual(newer_job, job)
+        self.cli("work", studio)
+        updated = json.loads(self.cli("jobs", studio).splitlines()[0])
+        newer = json.loads(updated["result"])
+        self.assertEqual(newer["reused"], 2)
+        audio = self.ff("-i", studio / newer["file"], "-map", "0:a:0", "-f", "s16le", "-")
+        self.assertNotEqual(audio[:19000], self.ff("-i", output, "-map", "0:a:0", "-f", "s16le", "-")[:19000])
+        self.cli("portable", studio, copied)
+        self.assertEqual((copied / result["file"]).read_bytes(), output.read_bytes())
+        self.assertIn(scene, self.cli("list", copied))
+        self.assertIn("Фоновая дорожка", self.cli("history", copied))
+        self.cli("restore", copied, "2")
+        self.assertIn("Восстановление ревизии 2", self.cli("history", copied))
+        self.cli("background", copied)
+        (studio / newer["file"]).write_bytes(b"corrupted export")
+        self.assertNotEqual(self.cli("queue-export", studio, "--draft").strip(), newer_job)
+        failed_copy = subprocess.run([sys.executable, "-X", "utf8", "-m", "efir", "portable",
+                                      str(studio), str(self.root / "Повреждённый")],
+                                     capture_output=True, timeout=20)
+        self.assertNotEqual(failed_copy.returncode, 0)
+        self.assertIn("отсутствует или изменился", failed_copy.stderr.decode("utf-8"))
+
+    def test_sqlite_command_errors_and_task_actions(self):
+        studio = self.root / "Новый"
+        self.cli("init", studio, "--sqlite", "--title", "Новый")
+        failed = self.cli("queue-export", studio).strip()
+        self.cli("work", studio)
+        self.assertEqual(json.loads(self.cli("jobs", studio))["state"], "failed")
+        self.cli("retry", studio, failed)
+        self.cli("cancel", studio, failed)
+        self.assertEqual(json.loads(self.cli("jobs", studio))["state"], "cancelled")
+        self.assertIn("Нет доступных", self.cli("work", studio))
 
 
 if __name__ == "__main__":

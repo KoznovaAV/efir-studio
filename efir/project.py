@@ -20,6 +20,7 @@ IMAGE = {".png", ".jpg", ".jpeg"}
 AUDIO = {".wav": "wav", ".mp3": "mp3", ".flac": "flac", ".m4a": "mov"}
 ASSET = re.compile(r"[a-f0-9]{64}\.[a-z0-9]+")
 SCENE_ID = re.compile(r"[a-f0-9]{12}")
+SQLITE_MANIFEST = "project.sqlite"
 
 
 class EfirError(Exception):
@@ -115,7 +116,7 @@ class Scene:
     caption: str = ""
     notes: str = ""
 
-    def validate(self):
+    def validate(self, *, allow_missing_visual=False):
         if not isinstance(self.id, str) or not SCENE_ID.fullmatch(self.id):
             raise EfirError("Неверный идентификатор сцены.")
         if not all(isinstance(value, str) and "\x00" not in value
@@ -127,10 +128,14 @@ class Scene:
             raise EfirError("Начальная позиция должна быть от 0 до 600 секунд.")
         if self.fit not in ("contain", "cover") or type(self.source_audio) is not bool:
             raise EfirError("Неверный режим кадрирования или исходного звука.")
-        validate_ref(self.visual, {*VIDEO, *IMAGE})
+        if self.visual is None and allow_missing_visual:
+            if self.start_frame or self.source_audio:
+                raise EfirError("Для сцены без клипа сбросьте начальную позицию и исходный звук.")
+        else:
+            validate_ref(self.visual, {*VIDEO, *IMAGE})
         if self.voice is not None:
             validate_ref(self.voice, AUDIO)
-        if Path(self.visual).suffix in IMAGE and (self.start_frame or self.source_audio):
+        if self.visual is not None and Path(self.visual).suffix in IMAGE and (self.start_frame or self.source_audio):
             raise EfirError("Для изображения сбросьте начальную позицию и исходный звук.")
 
 
@@ -193,6 +198,8 @@ class Project:
                 "scenes": [asdict(scene) for scene in self.scenes]}
         payload = (json.dumps(data, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
         with project_lock(self.inside(".project.lock")):
+            if (self.root / SQLITE_MANIFEST).exists():
+                raise EfirError("В каталоге уже хранится проект SQLite.")
             current = digest_file(target) if target.exists() else None
             if current != self._revision:
                 raise EfirError("Проект уже существует или изменился. Откройте его снова.")

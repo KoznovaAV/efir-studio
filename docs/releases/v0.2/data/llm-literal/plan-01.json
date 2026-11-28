@@ -1,0 +1,490 @@
+{
+  "case": 1,
+  "prompt": "Создай шесть сцен для полутораминутного выпуска о странном радиосигнале",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": []
+  },
+  "base_revision": 1,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "think": false,
+  "operations": [
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "На радиостанции обнаружили странный сигнал, который не соответствует ни одному известному радиопротоколу. Время: 00:15.000 (секунда).",
+      "title": "Обнаружение необычного сигнала"
+    },
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "Сигнал содержит аномальные паттерны, которые могут быть признаком искусственного происхождения или ошибки в радиосистеме.",
+      "title": "Анализ сигнала"
+    },
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "Мы предполагаем, что сигнал может быть связан с неизвестным киберпространством или тестовой системой.",
+      "title": "Гипотеза о киберпространстве"
+    },
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "Команда проверяет сигнал на наличие ошибок в кодировании и подтверждает его корректность.",
+      "title": "Проверка на ошибки"
+    },
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "Сигнал показывает связь с неизвестным киберпространством, что требует дополнительных исследований.",
+      "title": "Связь с киберпространством"
+    },
+    {
+      "frames": 375,
+      "op": "add",
+      "speech": "Для дальнейшего анализа рекомендуется продолжать наблюдение за сигналом и уточнить его происхождение.",
+      "title": "Решение: продолжить наблюдение"
+    }
+  ],
+  "unchanged_before_approval": true,
+  "after": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "362a2d81b7e3",
+        "title": "Обнаружение необычного сигнала",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "На радиостанции обнаружили странный сигнал, который не соответствует ни одному известному радиопротоколу. Время: 00:15.000 (секунда)."
+      },
+      {
+        "id": "cf6c6389cb43",
+        "title": "Анализ сигнала",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Сигнал содержит аномальные паттерны, которые могут быть признаком искусственного происхождения или ошибки в радиосистеме."
+      },
+      {
+        "id": "71951f21c259",
+        "title": "Гипотеза о киберпространстве",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Мы предполагаем, что сигнал может быть связан с неизвестным киберпространством или тестовой системой."
+      },
+      {
+        "id": "086134287c7b",
+        "title": "Проверка на ошибки",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Команда проверяет сигнал на наличие ошибок в кодировании и подтверждает его корректность."
+      },
+      {
+        "id": "728f4e38c687",
+        "title": "Связь с киберпространством",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Сигнал показывает связь с неизвестным киберпространством, что требует дополнительных исследований."
+      },
+      {
+        "id": "cd791a6d5291",
+        "title": "Решение: продолжить наблюдение",
+        "visual": null,
+        "frames": 375,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Для дальнейшего анализа рекомендуется продолжать наблюдение за сигналом и уточнить его происхождение."
+      }
+    ]
+  },
+  "revision": 2,
+  "jobs": [],
+  "seconds": 11.757,
+  "raw": {
+    "model": "qwen3:4b",
+    "created_at": "2026-11-28T14:55:42.3175108Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\n  \"base_revision\": 1,\n  \"operations\": [\n    {\n      \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Обнаружение необычного сигнала\",\n      \"speech\": \"На радиостанции обнаружили странный сигнал, который не соответствует ни одному известному радиопротоколу. Время: 00:15.000 (секунда).\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Анализ сигнала\",\n      \"speech\": \"Сигнал содержит аномальные паттерны, которые могут быть признаком искусственного происхождения или ошибки в радиосистеме.\"\n    },\n    {\n       \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Гипотеза о киберпространстве\",\n      \"speech\": \"Мы предполагаем, что сигнал может быть связан с неизвестным киберпространством или тестовой системой.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Проверка на ошибки\",\n      \"speech\": \"Команда проверяет сигнал на наличие ошибок в кодировании и подтверждает его корректность.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Связь с киберпространством\",\n      \"speech\": \"Сигнал показывает связь с неизвестным киберпространством, что требует дополнительных исследований.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 15.0,\n      \"title\": \"Решение: продолжить наблюдение\",\n      \"speech\": \"Для дальнейшего анализа рекомендуется продолжать наблюдение за сигналом и уточнить его происхождение.\"\n    }\n  ]\n}"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 11715553000,
+    "load_duration": 2742671800,
+    "prompt_eval_count": 468,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 295692000,
+    "eval_count": 473,
+    "eval_duration": 8662224000
+  },
+  "samples": [
+    {
+      "seconds": 0.001,
+      "rss_mib": 104.77,
+      "available_mib": 3819.51,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.277,
+      "rss_mib": 238.09,
+      "available_mib": 3681.24,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.493,
+      "rss_mib": 189.41,
+      "available_mib": 3737.55,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.711,
+      "rss_mib": 90.27,
+      "available_mib": 3820.82,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 0.928,
+      "rss_mib": 403.29,
+      "available_mib": 3512.25,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.207,
+      "rss_mib": 399.65,
+      "available_mib": 3507.65,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.422,
+      "rss_mib": 566.72,
+      "available_mib": 3335.85,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.638,
+      "rss_mib": 750.53,
+      "available_mib": 3163.42,
+      "gpu_mib": 73
+    },
+    {
+      "seconds": 1.855,
+      "rss_mib": 750.55,
+      "available_mib": 3129.51,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.133,
+      "rss_mib": 750.56,
+      "available_mib": 3115.12,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.35,
+      "rss_mib": 804.24,
+      "available_mib": 3078.61,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.568,
+      "rss_mib": 877.72,
+      "available_mib": 3002.2,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 2.785,
+      "rss_mib": 916.23,
+      "available_mib": 2947.26,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.097,
+      "rss_mib": 918.7,
+      "available_mib": 2991.21,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.316,
+      "rss_mib": 918.73,
+      "available_mib": 2989.65,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.533,
+      "rss_mib": 921.6,
+      "available_mib": 3027.47,
+      "gpu_mib": 3791
+    },
+    {
+      "seconds": 3.755,
+      "rss_mib": 921.61,
+      "available_mib": 3030.88,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.034,
+      "rss_mib": 921.62,
+      "available_mib": 3040.98,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.25,
+      "rss_mib": 921.62,
+      "available_mib": 3037.25,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.466,
+      "rss_mib": 921.62,
+      "available_mib": 3035.77,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.684,
+      "rss_mib": 915.69,
+      "available_mib": 3046.0,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.979,
+      "rss_mib": 915.7,
+      "available_mib": 3050.51,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.198,
+      "rss_mib": 933.02,
+      "available_mib": 3033.28,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.416,
+      "rss_mib": 915.73,
+      "available_mib": 3064.44,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.648,
+      "rss_mib": 915.73,
+      "available_mib": 3108.68,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.927,
+      "rss_mib": 915.73,
+      "available_mib": 3074.82,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.158,
+      "rss_mib": 915.74,
+      "available_mib": 3058.97,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.389,
+      "rss_mib": 915.75,
+      "available_mib": 3069.14,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.608,
+      "rss_mib": 922.29,
+      "available_mib": 3075.9,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.903,
+      "rss_mib": 922.29,
+      "available_mib": 3048.59,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.121,
+      "rss_mib": 922.3,
+      "available_mib": 3059.0,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.338,
+      "rss_mib": 922.3,
+      "available_mib": 3051.7,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.554,
+      "rss_mib": 922.32,
+      "available_mib": 3060.7,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.835,
+      "rss_mib": 922.32,
+      "available_mib": 3063.58,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.052,
+      "rss_mib": 922.33,
+      "available_mib": 3070.36,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.269,
+      "rss_mib": 922.34,
+      "available_mib": 3073.3,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.483,
+      "rss_mib": 922.34,
+      "available_mib": 3064.2,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.761,
+      "rss_mib": 922.34,
+      "available_mib": 3066.19,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.995,
+      "rss_mib": 922.34,
+      "available_mib": 3060.73,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.227,
+      "rss_mib": 922.34,
+      "available_mib": 3057.39,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.443,
+      "rss_mib": 922.35,
+      "available_mib": 3074.46,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.738,
+      "rss_mib": 922.35,
+      "available_mib": 3074.8,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.956,
+      "rss_mib": 922.35,
+      "available_mib": 3074.93,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.171,
+      "rss_mib": 922.35,
+      "available_mib": 3074.05,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.388,
+      "rss_mib": 922.35,
+      "available_mib": 3034.79,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.668,
+      "rss_mib": 922.35,
+      "available_mib": 3026.1,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.885,
+      "rss_mib": 922.35,
+      "available_mib": 3060.55,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 11.103,
+      "rss_mib": 922.35,
+      "available_mib": 3060.73,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 11.321,
+      "rss_mib": 922.35,
+      "available_mib": 3066.54,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 11.6,
+      "rss_mib": 922.37,
+      "available_mib": 3072.65,
+      "gpu_mib": 3795
+    }
+  ],
+  "peak_rss_mib": 933.02,
+  "min_available_mib": 2947.26,
+  "peak_gpu_mib": 3795,
+  "sampled_cpu_seconds": 12.578
+}

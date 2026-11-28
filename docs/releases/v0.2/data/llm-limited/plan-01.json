@@ -1,0 +1,409 @@
+{
+  "case": 1,
+  "prompt": "Создай шесть сцен для полутораминутного выпуска о странном радиосигнале",
+  "before": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": []
+  },
+  "base_revision": 1,
+  "ollama": "0.40.19",
+  "model": {
+    "name": "qwen3:4b",
+    "model": "qwen3:4b",
+    "modified_at": "2026-11-28T17:30:17.0547325+03:00",
+    "size": 2497293931,
+    "digest": "359d7dd4bcdab3d86b87d73ac27966f4dbb9f5efdfcc75d34a8764a09474fae7",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "completion",
+      "tools",
+      "thinking"
+    ]
+  },
+  "context": 8192,
+  "keep_alive": 0,
+  "unchanged_before_approval": true,
+  "after": {
+    "title": "Проверка Qwen3",
+    "aspect": "9:16",
+    "background": null,
+    "scenes": [
+      {
+        "id": "d6b14763305c",
+        "title": "Начало радиосигнала",
+        "visual": null,
+        "frames": 750,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Появляется странный радиосигнал в ночном небе, необычный звук, как будто из космоса."
+      },
+      {
+        "id": "2fe0410f080f",
+        "title": "Исследование сигнала",
+        "visual": null,
+        "frames": 750,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Научные эксперты начинают анализировать сигнал, ищут его источник."
+      },
+      {
+        "id": "11fa370d4353",
+        "title": "Предположение об источнике",
+        "visual": null,
+        "frames": 625,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Сигнал может быть от космических объектов или природных явлений, но неясно."
+      },
+      {
+        "id": "0df8bf08e003",
+        "title": "Проверка гипотезы",
+        "visual": null,
+        "frames": 625,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Эксперты проверяют гипотезу о космических источниках, но данные не подтверждают."
+      },
+      {
+        "id": "c110a488db13",
+        "title": "Сигнал исчезает",
+        "visual": null,
+        "frames": 625,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Сигнал внезапно пропадает, оставляя вопросы и загадки."
+      },
+      {
+        "id": "da3ddbba845a",
+        "title": "Заключение",
+        "visual": null,
+        "frames": 750,
+        "voice": null,
+        "start_frame": 0,
+        "fit": "contain",
+        "source_audio": false,
+        "caption": "",
+        "notes": "",
+        "speech": "Вывод: Странный радиосигнал — это явление, которое требует дальнейших исследований."
+      }
+    ]
+  },
+  "revision": 2,
+  "jobs": [],
+  "seconds": 11.534,
+  "raw": {
+    "model": "qwen3:4b",
+    "created_at": "2026-11-28T14:38:34.3231703Z",
+    "message": {
+      "role": "assistant",
+      "content": "{\n  \"base_revision\": 1,\n  \"operations\": [\n    {\n      \"op\": \"add\",\n      \"seconds\": 30.0,\n      \"title\": \"Начало радиосигнала\",\n      \"speech\": \"Появляется странный радиосигнал в ночном небе, необычный звук, как будто из космоса.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 30.0,\n      \"title\": \"Исследование сигнала\",\n      \"speech\": \"Научные эксперты начинают анализировать сигнал, ищут его источник.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 25.0,\n      \"title\": \"Предположение об источнике\",\n      \"speech\": \"Сигнал может быть от космических объектов или природных явлений, но неясно.\"\n    },\n    {\n     \"op\": \"add\",\n      \"seconds\": 25.0,\n      \"title\": \"Проверка гипотезы\",\n      \"speech\": \"Эксперты проверяют гипотезу о космических источниках, но данные не подтверждают.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 25.0,\n      \"title\": \"Сигнал исчезает\",\n      \"speech\": \"Сигнал внезапно пропадает, оставляя вопросы и загадки.\"\n    },\n    {\n      \"op\": \"add\",\n      \"seconds\": 30.0,\n      \"title\": \"Заключение\",\n      \"speech\": \"Вывод: Странный радиосигнал — это явление, которое требует дальнейших исследований.\"\n    }\n  ]\n}"
+    },
+    "done": true,
+    "done_reason": "stop",
+    "total_duration": 11502692000,
+    "load_duration": 3917157000,
+    "prompt_eval_count": 399,
+    "prompt_eval_cached_count": 0,
+    "prompt_eval_duration": 256802000,
+    "eval_count": 415,
+    "eval_duration": 7316991000
+  },
+  "samples": [
+    {
+      "seconds": 0.001,
+      "rss_mib": 294.73,
+      "available_mib": 3682.07,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 1.823,
+      "rss_mib": 104.55,
+      "available_mib": 3927.22,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 2.102,
+      "rss_mib": 194.21,
+      "available_mib": 3855.01,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 2.32,
+      "rss_mib": 348.96,
+      "available_mib": 3691.26,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 2.536,
+      "rss_mib": 442.12,
+      "available_mib": 3613.76,
+      "gpu_mib": 0
+    },
+    {
+      "seconds": 2.755,
+      "rss_mib": 752.68,
+      "available_mib": 3288.42,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 3.05,
+      "rss_mib": 752.69,
+      "available_mib": 3293.75,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 3.27,
+      "rss_mib": 752.71,
+      "available_mib": 3282.14,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 3.488,
+      "rss_mib": 752.72,
+      "available_mib": 3270.47,
+      "gpu_mib": 2449
+    },
+    {
+      "seconds": 3.705,
+      "rss_mib": 861.45,
+      "available_mib": 3152.77,
+      "gpu_mib": 3783
+    },
+    {
+      "seconds": 3.984,
+      "rss_mib": 893.94,
+      "available_mib": 3121.15,
+      "gpu_mib": 3783
+    },
+    {
+      "seconds": 4.203,
+      "rss_mib": 920.9,
+      "available_mib": 3087.94,
+      "gpu_mib": 3783
+    },
+    {
+      "seconds": 4.419,
+      "rss_mib": 924.05,
+      "available_mib": 3079.57,
+      "gpu_mib": 3783
+    },
+    {
+      "seconds": 4.637,
+      "rss_mib": 932.89,
+      "available_mib": 3109.0,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 4.917,
+      "rss_mib": 925.39,
+      "available_mib": 3117.56,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.137,
+      "rss_mib": 925.39,
+      "available_mib": 3128.66,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.355,
+      "rss_mib": 925.4,
+      "available_mib": 3128.42,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.572,
+      "rss_mib": 918.02,
+      "available_mib": 3137.52,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 5.838,
+      "rss_mib": 917.94,
+      "available_mib": 3122.23,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.056,
+      "rss_mib": 918.21,
+      "available_mib": 3145.73,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.274,
+      "rss_mib": 918.21,
+      "available_mib": 3136.89,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.492,
+      "rss_mib": 918.22,
+      "available_mib": 3179.98,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.772,
+      "rss_mib": 918.22,
+      "available_mib": 3184.87,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 6.99,
+      "rss_mib": 918.22,
+      "available_mib": 3174.87,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.208,
+      "rss_mib": 918.22,
+      "available_mib": 3182.88,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.425,
+      "rss_mib": 918.22,
+      "available_mib": 3181.06,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.704,
+      "rss_mib": 918.22,
+      "available_mib": 3171.84,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 7.921,
+      "rss_mib": 918.22,
+      "available_mib": 3178.59,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.139,
+      "rss_mib": 933.77,
+      "available_mib": 3172.19,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.358,
+      "rss_mib": 924.16,
+      "available_mib": 3178.38,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.622,
+      "rss_mib": 924.16,
+      "available_mib": 3177.44,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 8.84,
+      "rss_mib": 924.16,
+      "available_mib": 3177.34,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.057,
+      "rss_mib": 924.16,
+      "available_mib": 3179.52,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.277,
+      "rss_mib": 924.16,
+      "available_mib": 3174.27,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.526,
+      "rss_mib": 924.16,
+      "available_mib": 3171.61,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.743,
+      "rss_mib": 924.16,
+      "available_mib": 3176.25,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 9.96,
+      "rss_mib": 924.16,
+      "available_mib": 3174.79,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.178,
+      "rss_mib": 924.16,
+      "available_mib": 3178.1,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.458,
+      "rss_mib": 924.16,
+      "available_mib": 3175.13,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.675,
+      "rss_mib": 924.16,
+      "available_mib": 3166.17,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 10.89,
+      "rss_mib": 924.16,
+      "available_mib": 3154.8,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 11.107,
+      "rss_mib": 924.16,
+      "available_mib": 3176.67,
+      "gpu_mib": 3795
+    },
+    {
+      "seconds": 11.384,
+      "rss_mib": 924.16,
+      "available_mib": 3169.22,
+      "gpu_mib": 3795
+    }
+  ],
+  "peak_rss_mib": 933.77,
+  "min_available_mib": 3079.57,
+  "peak_gpu_mib": 3795,
+  "sampled_cpu_seconds": 11.656
+}
