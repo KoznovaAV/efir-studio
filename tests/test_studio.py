@@ -401,7 +401,7 @@ class PlanTests(StudioFixture):
         self.assertEqual(proposals(self.project), [])
 
     def test_ollama_protocol_uses_schema_and_redacts_media_paths(self):
-        model_message = self.data({"op": "add", "title": "Передача", "frames": 400})
+        model_message = self.data({"op": "add", "title": "Передача", "seconds": 16})
         requests = []
 
         class Handler(BaseHTTPRequestHandler):
@@ -428,7 +428,8 @@ class PlanTests(StudioFixture):
             worker.start()
             try:
                 client = Ollama("qwen3:4b", port=server.server_port, timeout=2)
-                self.assertEqual(client.plan(self.project, "Сделай выпуск"), model_message)
+                self.assertEqual(client.plan(self.project, "Сделай выпуск"),
+                                 self.data({"op": "add", "title": "Передача", "frames": 400}))
                 with self.assertRaisesRegex(EfirError, "отсутствует"):
                     Ollama("missing", port=server.server_port).plan(self.project, "Текст")
                 with self.assertRaisesRegex(EfirError, "HTTP 404"):
@@ -460,6 +461,100 @@ class PlanTests(StudioFixture):
             response.read.return_value = b"x" * 256001
             with self.assertRaisesRegex(EfirError, "велик"):
                 client.request("/api/tags")
+
+    def test_ollama_schema_disallows_unknown_ids_and_uses_seconds(self):
+        from efir.assistant import from_model, schema
+
+        variants = schema(1, 0)["properties"]["operations"]["items"]["anyOf"]
+        self.assertEqual([variant["properties"]["op"]["const"] for variant in variants], ["add"])
+        variants = schema(self.project.revision, 2)["properties"]["operations"]["items"]["anyOf"]
+        self.assertEqual(variants[1]["properties"]["scene"]["enum"], [1, 2])
+        translated = from_model(self.project, self.data({"op": "edit", "scene": 2, "seconds": 12.4}))
+        self.assertEqual(translated, self.data({"op": "edit", "scene": self.second.id, "frames": 310}))
+        for value in ("10", True, 0.03, float("nan"), 600.01):
+            with self.subTest(value=value), self.assertRaisesRegex(EfirError, "числом от"):
+                from_model(self.project, self.data({"op": "edit", "scene": 1, "seconds": value}))
+        for data in ({"operations": {}}, None):
+            with self.assertRaisesRegex(EfirError, "не вернул операции"):
+                from_model(self.project, data)
+        for operation in (None, {"op": "add", "title": "Кадры", "frames": 310}):
+            with self.assertRaisesRegex(EfirError, "числом секунд"):
+                from_model(self.project, self.data(operation))
+        for scene in ("0" * 12, ["not an identifier"], 3):
+            with self.assertRaisesRegex(EfirError, "номер вне списка"):
+                from_model(self.project, self.data({"op": "edit", "scene": scene, "seconds": 12}))
+        with self.assertRaisesRegex(EfirError, "превышает"):
+            from_model(self.project, self.data({"op": "add", "title": "д" * 101, "seconds": 12}))
+        with self.assertRaisesRegex(EfirError, "Неверные поля"):
+            from_model(self.project, self.data({"op": "add", "title": "Идея", "seconds": 16, "path": "../.."}))
+
+    def test_add_can_insert_between_existing_scenes(self):
+        plan = self.mock_proposal({"op": "add", "title": "Заставка", "frames": 150, "position": 2})
+        self.assertEqual([scene.title for scene in self.project.scenes], [self.first.title, self.second.title])
+        decision(self.project, plan, accept=True)
+        updated = StudioProject.open(self.project.root)
+        self.assertEqual([scene.title for scene in updated.scenes], [self.first.title, "Заставка", self.second.title])
+        self.assertEqual(updated.scenes[1].frames, 150)
+
+    def test_explicit_creation_budget_is_checked_before_approval(self):
+        from efir.assistant import creation_budget, from_model, schema
+
+        budget = creation_budget("Вставь между сценами вставку на 9,2 секунды с субтитрами", 2)
+        self.assertEqual((budget.count, budget.seconds, budget.between, budget.required_text),
+                         (1, 9.2, True, ("caption",)))
+        cases = schema(self.project.revision, 2, budget)["properties"]["operations"]
+        self.assertEqual((cases["minItems"], cases["maxItems"]), (1, 1))
+        self.assertEqual(cases["items"]["anyOf"][0]["properties"]["seconds"]["const"], 9.2)
+        good = {"op": "add", "title": "Вставка", "seconds": 9.2, "position": 2, "caption": "Локальный канал"}
+        self.assertEqual(from_model(self.project, self.data(dict(good)), budget)["operations"][0]["frames"], 230)
+        for ops in (
+            [{**good, "seconds": 8}], [{**good, "position": 1}], [good, good], [{**good, "caption": ""}],
+            [{"op": "edit", "scene": 1, "title": "Другое"}],
+        ):
+            with self.assertRaisesRegex(EfirError, "не соблюдает"):
+                from_model(self.project, self.data(*(dict(op) for op in ops)), budget)
+        examples = [
+            ("Создай четыре сцены общей длительностью 52 секунды", 4, 13.0),
+            ("Сделай одну сцену на 8 секунд", 1, 8.0),
+            ("Придумай 10 сцен на полторы минуты", 10, 9.0),
+            ("Сделай две сцены по 30 секунд", 2, 30.0),
+        ]
+        for query, count, length in examples:
+            resolved = creation_budget(query, 0)
+            self.assertEqual((resolved.count, resolved.seconds), (count, length))
+        for query in ("Озвучь сцену", "Создай набросок", "Создай 30 сцен", "Добавь сцену на 601 секунду",
+                      "Добавь сцену и озвучь текущую"):
+            self.assertIsNone(creation_budget(query, 2))
+
+    def test_literal_edit_is_bound_to_target_and_preserves_other_fields(self):
+        from efir.assistant import from_model, literal_edit, schema
+
+        scenes = self.project.scenes
+        edit = literal_edit("Замени реплику в «Второй» на «Микрофон выключен» и добавь её озвучку", scenes)
+        self.assertEqual((edit.scene, edit.field, edit.value, edit.voice), (2, "speech", "Микрофон выключен", True))
+        kinds = schema(2, 2, exact=edit)["properties"]["operations"]
+        self.assertEqual((kinds["minItems"], kinds["maxItems"]), (2, 2))
+        props = kinds["items"]["anyOf"][0]["properties"]
+        self.assertEqual(props["scene"]["const"], 2)
+        self.assertEqual(props["speech"]["const"], edit.value)
+        first = {"op": "edit", "scene": 2, "speech": edit.value}
+        second = {"op": "voice", "scene": 2}
+        result = from_model(self.project, self.data(dict(first), dict(second)), exact=edit)
+        self.assertEqual(result["operations"][0]["scene"], self.second.id)
+        for ops in ([first], [{**first, "scene": 1}, second], [{**first, "caption": "лишнее"}, second]):
+            with self.assertRaisesRegex(EfirError, "точной правке"):
+                from_model(self.project, self.data(*(dict(op) for op in ops)), exact=edit)
+        title = literal_edit("Переименуй первую сцену в «Ночь»", scenes)
+        self.assertEqual((title.scene, title.field, title.voice), (1, "title", False))
+        caption = literal_edit("Исправь субтитр в «Второй» на «Мы тут»", scenes)
+        self.assertEqual((caption.scene, caption.field, caption.value), (2, "caption", "Мы тут"))
+        self.assertFalse(literal_edit("Измени реплику сцены №1 на «Тишина», без озвучки", scenes).voice)
+        for query in ("Привет", "Замени реплику", "Измени неизвестное на «Текст»",
+                      "Замени реплику первой и второй сцены на «Текст»",
+                      "Замени реплику в «Несуществующая» на «Текст»",
+                      "Замени реплику первой сцены на «Текст» и перемести её",
+                      "Замени реплику первой сцены на «Текст» и озвучь вторую сцену"):
+            self.assertIsNone(literal_edit(query, scenes))
 
 class PiperTests(StudioFixture):
     def setUp(self):
